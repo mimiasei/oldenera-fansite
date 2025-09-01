@@ -4,7 +4,7 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="text-center">
           <p className="text-gray-300 mb-2">
-            &copy; 2024 Heroes of Might and Magic: Olden Era Fan Site
+            &copy; 2025 Heroes of Might and Magic: Olden Era Fan Site
           </p>
           <p className="text-gray-400 text-sm">
             This is an unofficial fan site. Heroes of Might and Magic is a trademark of Ubisoft Entertainment.

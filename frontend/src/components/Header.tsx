@@ -6,7 +6,7 @@ const Header = () => {
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-between">
           <Link to="/" className="text-2xl font-bold font-fantasy">
-            Heroes of Might and Magic: Olden Era
+            Fan Site - Heroes of Might and Magic: Olden Era
           </Link>
           <nav>
             <ul className="flex space-x-6">
@@ -31,7 +31,7 @@ const Header = () => {
                   to="/game-info" 
                   className="hover:text-primary-200 transition-colors duration-200"
                 >
-                  Game Info
+                  Factions
                 </Link>
               </li>
               <li>

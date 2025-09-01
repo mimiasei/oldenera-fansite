@@ -16,8 +16,8 @@ function App() {
             <Route path="/news" element={<News />} />
             <Route path="/game-info" element={
               <div className="container mx-auto px-4 py-8 text-center">
-                <h1 className="text-4xl font-bold mb-6 font-fantasy">Game Information</h1>
-                <p className="text-lg text-gray-600">Game information page coming soon...</p>
+                <h1 className="text-4xl font-bold mb-6 font-fantasy">Factions</h1>
+                <p className="text-lg text-gray-600">Factions page coming soon...</p>
               </div>
             } />
             <Route path="/screenshots" element={
