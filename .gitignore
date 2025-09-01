@@ -37,6 +37,7 @@ artifacts/
 *.pidb
 *.svclog
 *.scc
+*.png
 
 # .NET Core
 project.lock.json
