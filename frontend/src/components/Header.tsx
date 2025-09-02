@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 const Header = () => {
   return (
     <header className="fantasy-gradient text-white shadow-lg">
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex items-center justify-between">
-          <Link to="/" className="text-2xl font-bold font-fantasy">
-            Fan Site - Heroes of Might and Magic: Olden Era
+      <div className="container mx-auto px-4 py-2">
+        <div className="flex items-center justify-between mb-6">
+          <Link to="/" className="font-bold font-fantasy">
+              <div className="text-3xl">Olden Wiki</div>
+              <div className="text-xs ml-4">A Heroes of Might and Magic: Olden Era Fan Site</div>
           </Link>
           <nav>
             <ul className="flex space-x-6">
