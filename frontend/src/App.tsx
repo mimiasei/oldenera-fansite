@@ -26,6 +26,12 @@ function App() {
                 <p className="text-lg text-gray-600">Screenshots gallery coming soon...</p>
               </div>
             } />
+              <Route path="/forum" element={
+                  <div className="container mx-auto px-4 py-8 text-center">
+                      <h1 className="text-4xl font-bold mb-6 font-fantasy">Forum</h1>
+                      <p className="text-lg text-gray-600">Forum coming soon...</p>
+                  </div>
+              } />
           </Routes>
         </main>
         

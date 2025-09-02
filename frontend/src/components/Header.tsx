@@ -43,6 +43,14 @@ const Header = () => {
                   Screenshots
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/forum"
+                  className="hover:text-primary-200 transition-colors duration-200"
+                >
+                  Forum
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
