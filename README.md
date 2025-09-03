@@ -4,19 +4,24 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 
 ## 🏰 Features
 
-- **News Management System**: Full CRUD operations for news articles
-- **Responsive Design**: Built with Tailwind CSS and fantasy-themed styling
+- **News Management System**: Full CRUD operations for news articles with global state management
+- **Global State Management**: React Context API with TypeScript for centralized state
+- **Notification System**: Toast-style notifications with auto-dismiss functionality
+- **Responsive Design**: Built with Tailwind CSS and custom fantasy theme with background imagery
 - **Modern Tech Stack**: ASP.NET Core backend with React TypeScript frontend
 - **PostgreSQL Database**: Robust data storage with Entity Framework Core
+- **Image Management**: Organized storage structure for static assets and user uploads
+- **Type Safety**: Full TypeScript integration with custom hooks and interfaces
 - **Admin Panel**: Content management capabilities (planned)
-- **Community Features**: User comments and discussions (planned)
+- **Community Features**: User comments and forum discussions (planned)
 
 ## 🛠 Technology Stack
 
 - **Backend**: ASP.NET Core 8.0
 - **Frontend**: React 18 with TypeScript
+- **State Management**: React Context API with useReducer
 - **Database**: PostgreSQL with Entity Framework Core
-- **Styling**: Tailwind CSS with custom fantasy theme
+- **Styling**: Tailwind CSS with custom fantasy theme and background imagery
 - **Build Tool**: Vite
 - **API**: RESTful API with Swagger documentation
 
@@ -34,11 +39,18 @@ oldenerafansite/
 │   │   ├── components/     # Reusable UI components
 │   │   ├── pages/          # Page components
 │   │   ├── services/       # API service layer
-│   │   └── types/          # TypeScript type definitions
+│   │   ├── store/          # Global state management
+│   │   ├── types/          # TypeScript type definitions
+│   │   └── assets/images/  # Build-processed images
+│   ├── public/images/      # Static image assets
 │   └── package.json        # Frontend dependencies
 ├── database/               # Database setup scripts
 │   ├── setup.sql          # Database schema and sample data
 │   └── README.md          # Database setup instructions
+├── backend/wwwroot/        # Static files served by backend
+│   ├── uploads/news/       # User-uploaded images
+│   └── static/images/      # Backend-managed images
+├── .gitignore             # Git ignore file
 ├── CHANGES.md             # Change log
 └── CLAUDE.md              # Project instructions
 ```
@@ -114,11 +126,16 @@ The site features a fantasy-themed design inspired by the Heroes of Might and Ma
 - [x] Basic project setup and structure
 - [x] News management system
 - [x] Responsive UI with fantasy theme
+- [x] Global state management with React Context
+- [x] Notification system with toast messages
+- [x] Image storage structure and organization
+- [x] Background imagery and visual enhancements
 - [ ] User authentication system
 - [ ] Comment system for news articles
 - [ ] Admin panel for content management
 - [ ] Image gallery for screenshots
 - [ ] Game information pages
+- [ ] Forum/discussion system
 - [ ] User profiles and community features
 
 ## 🤝 Contributing
