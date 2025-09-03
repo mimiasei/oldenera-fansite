@@ -18,11 +18,12 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 ## 🛠 Technology Stack
 
 - **Backend**: ASP.NET Core 8.0
-- **Frontend**: React 18 with TypeScript
-- **State Management**: React Context API with useReducer
+- **Frontend**: React Router v7 (modern Remix) with TypeScript and SSR ⚡
+- **Legacy Frontend**: React 18 with Vite (deprecated)
+- **State Management**: React Router v7 loaders with server-side data fetching
 - **Database**: PostgreSQL with Entity Framework Core
-- **Styling**: Tailwind CSS with custom fantasy theme and background imagery
-- **Build Tool**: Vite
+- **Styling**: Tailwind CSS v4 with custom fantasy theme and background imagery
+- **Build Tool**: React Router v7 bundler
 - **API**: RESTful API with Swagger documentation
 
 ## 📁 Project Structure
@@ -34,7 +35,7 @@ oldenerafansite/
 │   ├── Models/             # Data models
 │   ├── Data/               # Database context
 │   └── Program.cs          # Application entry point
-├── frontend/               # React TypeScript frontend
+├── frontend/               # Legacy React TypeScript frontend (Vite)
 │   ├── src/
 │   │   ├── components/     # Reusable UI components
 │   │   ├── pages/          # Page components
@@ -44,6 +45,14 @@ oldenerafansite/
 │   │   └── assets/images/  # Build-processed images
 │   ├── public/images/      # Static image assets
 │   └── package.json        # Frontend dependencies
+├── frontend-remix/         # React Router v7 frontend with SSR ⚡
+│   ├── app/
+│   │   ├── components/     # React Router v7 components
+│   │   ├── lib/            # API services and utilities
+│   │   ├── routes/         # File-based routing with loaders
+│   │   └── types/          # TypeScript interfaces
+│   ├── public/             # Static assets
+│   └── package.json        # React Router v7 dependencies
 ├── database/               # Database setup scripts
 │   ├── setup.sql          # Database schema and sample data
 │   └── README.md          # Database setup instructions
@@ -88,7 +97,7 @@ dotnet run
 
 The API will be available at `https://localhost:5001` with Swagger documentation.
 
-### Frontend Setup
+### Frontend Setup (Legacy)
 
 ```bash
 cd frontend
@@ -96,7 +105,24 @@ npm install
 npm run dev
 ```
 
-The frontend will be available at `http://localhost:5173`.
+### Frontend Setup (React Router v7) ⚡
+
+**IMPORTANT**: Start the backend first, as the frontend requires server-side data loading.
+
+Terminal 1 - Backend:
+```bash
+cd backend
+dotnet run
+```
+
+Terminal 2 - Frontend:
+```bash
+cd frontend-remix
+npm install
+npm run dev
+```
+
+The React Router v7 frontend will be available at `http://localhost:5173` with server-side rendering.
 
 ## 🧪 Development Commands
 
@@ -106,12 +132,18 @@ The frontend will be available at `http://localhost:5173`.
 - `dotnet test` - Run tests
 - `dotnet ef database update` - Apply database migrations
 
-### Frontend
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run type-check` - TypeScript type checking
+### Frontend (Legacy - React + Vite)
+- `cd frontend && npm run dev` - Start development server
+- `cd frontend && npm run build` - Build for production
+- `cd frontend && npm run preview` - Preview production build
+- `cd frontend && npm run lint` - Run ESLint
+- `cd frontend && npm run type-check` - TypeScript type checking
+
+### Frontend (React Router v7) ⚡
+- `cd frontend-remix && npm run dev` - Start development server
+- `cd frontend-remix && npm run build` - Build for production
+- `cd frontend-remix && npm run start` - Start production server
+- `cd frontend-remix && npm run typecheck` - TypeScript type checking
 
 ## 🎨 Design
 
@@ -126,10 +158,13 @@ The site features a fantasy-themed design inspired by the Heroes of Might and Ma
 - [x] Basic project setup and structure
 - [x] News management system
 - [x] Responsive UI with fantasy theme
-- [x] Global state management with React Context
-- [x] Notification system with toast messages
+- [x] Global state management with React Context (legacy)
+- [x] React Router v7 migration with SSR
+- [x] File-based routing system
+- [x] Server-side data loading with loaders
 - [x] Image storage structure and organization
 - [x] Background imagery and visual enhancements
+- [x] Production-ready architecture cleanup
 - [ ] User authentication system
 - [ ] Comment system for news articles
 - [ ] Admin panel for content management

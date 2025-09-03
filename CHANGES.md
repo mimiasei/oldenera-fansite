@@ -140,3 +140,102 @@
 - Image storage structure ready for content
 - Enhanced user experience with better visual feedback
 - Project ready for further feature development
+
+## 2025-09-03 (Part 2)
+
+### React Router v7 Migration Started
+- **Architecture Change**: Initiated migration from React + Vite to React Router v7 (modern Remix)
+- **New Project Structure**: Created `frontend-remix/` directory with React Router v7 setup
+- **Technology Stack Update**:
+  - React Router v7 with TypeScript support
+  - Tailwind CSS v4 with new `@theme` configuration syntax
+  - Server-side data loading with loaders (planned)
+  - File-based routing system (in progress)
+
+### Dependency Management
+- Added axios for API communication with existing ASP.NET Core backend
+- Maintained compatibility with current backend without changes
+- Configured React Router v7 development environment
+
+### Styling System Migration
+- **Tailwind CSS v4**: Updated configuration to use new `@theme` syntax
+- **Custom Properties**: Converted color schemes to CSS custom properties:
+  - Primary colors: Orange/amber palette (--color-primary-50 to --color-primary-900)
+  - Secondary colors: Blue palette (--color-secondary-50 to --color-secondary-900)
+- **Typography**: Preserved Cinzel (fantasy) and Inter (body) font configuration
+- **Component Classes**: Maintained existing utility classes (btn, card, fantasy-gradient)
+- **Google Fonts**: Integrated font loading in new CSS structure
+
+### Component Migration
+- **Header Component**: Updated to use React Router v7 Link component
+- **Footer Component**: Migrated with preserved styling and layout
+- **Import Updates**: Changed from 'react-router-dom' to 'react-router'
+- **Type Safety**: Maintained TypeScript interfaces and NewsArticle types
+
+### API Integration
+- **Service Layer**: Recreated API services in `app/lib/api.ts`
+- **Types**: Copied NewsArticle interface to `app/types/index.ts`
+- **Backend Compatibility**: Maintained connection to existing ASP.NET Core API
+- **Environment Variables**: Configured for React Router v7 environment
+
+### Migration Strategy
+- **Hybrid Approach**: Keeping ASP.NET Core backend, migrating only frontend
+- **Incremental Migration**: Starting with foundation, then routes and components
+- **Data Loading**: Planning to implement React Router v7 loaders for server-side data fetching
+- **File-based Routing**: Preparing route structure for /home, /news, /game-info, /screenshots, /forum
+
+### Status
+- Migration foundation completed successfully
+- React Router v7 project structure established
+- Styling and components migrated
+- Ready for file-based routing implementation
+- Backend API integration preserved
+
+## 2025-09-03 (Part 3)
+
+### React Router v7 File-based Routing Implementation
+- **Complete Route Structure**: Implemented file-based routing system with all major pages:
+  - `/` (home) - Homepage with hero section and latest news
+  - `/news` - Full news listing page
+  - `/news/:id` - Individual news article pages (placeholder)
+  - `/game-info` - Game information page (placeholder)
+  - `/screenshots` - Media gallery page (placeholder)
+  - `/forum` - Community forum page (placeholder)
+
+### Server-Side Data Loading (SSR)
+- **Loader Functions**: Implemented proper React Router v7 loaders for data fetching:
+  - Home route loader: Fetches latest 3 news articles for homepage display
+  - News route loader: Fetches all news articles for listing page
+  - Server-side rendering with real-time data from ASP.NET Core API
+- **Type Safety**: Generated route types using React Router v7 TypeScript integration
+- **Error Handling**: Proper server-side error handling with React Router patterns
+
+### UI and Component Updates
+- **Background Integration**: Added OE_wallpapper.webp background with gradient overlay
+- **Responsive Design**: Enhanced mobile and desktop layouts with Tailwind CSS v4
+- **Navigation**: Updated header navigation with proper React Router Link components
+- **Card Components**: Improved news article card styling and hover effects
+
+### Development Environment Configuration
+- **Environment Variables**: Configured `.env` file with proper API URLs
+- **Development Workflow**: Set up proper development server configuration
+- **API Integration**: Seamless connection to existing ASP.NET Core backend
+
+### Architecture Cleanup and Best Practices
+- **Removed Temporary Workarounds**: Cleaned up development workarounds that were masking API connection issues
+- **Proper Error Handling**: Implemented clean Remix/React Router error handling patterns
+- **SSL Configuration**: Removed development SSL bypasses for proper production readiness
+- **Mock Data Removal**: Eliminated mock data fallbacks in favor of proper server-side data loading
+
+### Development Instructions
+- **Backend Startup**: Documented proper ASP.NET Core backend startup procedure
+- **API Dependencies**: Clear instructions on backend requirement for SSR data loading
+- **Development Workflow**: Two-terminal setup (backend: `dotnet run`, frontend: `npm run dev`)
+
+### Status
+- **Complete Remix Migration**: Successfully migrated from React + Vite to React Router v7
+- **SSR Implementation**: Full server-side rendering with real backend data
+- **Production Ready**: Clean architecture without development workarounds
+- **Proper Error Handling**: React Router error boundaries and server-side error handling
+- **Backend Integration**: Seamless connection to existing ASP.NET Core API
+- **Development Ready**: Clear startup instructions and proper environment configuration
