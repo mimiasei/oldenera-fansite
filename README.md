@@ -19,12 +19,12 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 
 - **Backend**: ASP.NET Core 8.0
 - **Frontend**: React Router v7 (modern Remix) with TypeScript and SSR ⚡
-- **Legacy Frontend**: React 18 with Vite (deprecated)
+- **Database**: PostgreSQL 15 in Docker container with Entity Framework Core
 - **State Management**: React Router v7 loaders with server-side data fetching
-- **Database**: PostgreSQL with Entity Framework Core
 - **Styling**: Tailwind CSS v4 with custom fantasy theme and background imagery
 - **Build Tool**: React Router v7 bundler
 - **API**: RESTful API with Swagger documentation
+- **DevOps**: Docker Compose for database containerization
 
 ## 📁 Project Structure
 
@@ -35,7 +35,15 @@ oldenerafansite/
 │   ├── Models/             # Data models
 │   ├── Data/               # Database context
 │   └── Program.cs          # Application entry point
-├── frontend/               # Legacy React TypeScript frontend (Vite)
+├── frontend-remix/         # React Router v7 frontend with SSR ⚡ (ACTIVE)
+│   ├── app/
+│   │   ├── components/     # React Router v7 components
+│   │   ├── lib/            # API services and utilities
+│   │   ├── routes/         # File-based routing with loaders
+│   │   └── types/          # TypeScript interfaces
+│   ├── public/             # Static assets
+│   └── package.json        # React Router v7 dependencies
+├── frontend/               # Legacy React TypeScript frontend (DEPRECATED)
 │   ├── src/
 │   │   ├── components/     # Reusable UI components
 │   │   ├── pages/          # Page components
@@ -45,17 +53,11 @@ oldenerafansite/
 │   │   └── assets/images/  # Build-processed images
 │   ├── public/images/      # Static image assets
 │   └── package.json        # Frontend dependencies
-├── frontend-remix/         # React Router v7 frontend with SSR ⚡
-│   ├── app/
-│   │   ├── components/     # React Router v7 components
-│   │   ├── lib/            # API services and utilities
-│   │   ├── routes/         # File-based routing with loaders
-│   │   └── types/          # TypeScript interfaces
-│   ├── public/             # Static assets
-│   └── package.json        # React Router v7 dependencies
 ├── database/               # Database setup scripts
 │   ├── setup.sql          # Database schema and sample data
+│   ├── init.sql           # Docker database initialization
 │   └── README.md          # Database setup instructions
+├── docker-compose.yml      # PostgreSQL Docker container setup
 ├── backend/wwwroot/        # Static files served by backend
 │   ├── uploads/news/       # User-uploaded images
 │   └── static/images/      # Backend-managed images
@@ -70,22 +72,22 @@ oldenerafansite/
 
 - [.NET 8.0 SDK](https://dotnet.microsoft.com/download)
 - [Node.js 18+](https://nodejs.org/)
-- [PostgreSQL 12+](https://www.postgresql.org/download/)
+- [Docker & Docker Compose](https://docs.docker.com/get-docker/)
 
-### Database Setup
+### Database Setup (Docker)
 
-1. Install and start PostgreSQL
-2. Create database and user:
-   ```sql
-   CREATE DATABASE oldenerafansite;
-   CREATE USER oldenerauser WITH PASSWORD 'your_secure_password';
-   GRANT ALL PRIVILEGES ON DATABASE oldenerafansite TO oldenerauser;
-   ```
-3. Run setup script:
+1. Start PostgreSQL container:
    ```bash
-   psql -U postgres -d oldenerafansite -f database/setup.sql
+   docker-compose up -d postgres
    ```
-4. Update connection string in `backend/appsettings.json`
+
+2. Verify container is running:
+   ```bash
+   docker ps
+   # Should show: oldenerafansite-postgres
+   ```
+
+The database will be automatically initialized with the schema and sample data.
 
 ### Backend Setup
 
@@ -97,25 +99,22 @@ dotnet run
 
 The API will be available at `https://localhost:5001` with Swagger documentation.
 
-### Frontend Setup (Legacy)
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
 ### Frontend Setup (React Router v7) ⚡
 
-**IMPORTANT**: Start the backend first, as the frontend requires server-side data loading.
+**IMPORTANT**: Start services in order for proper operation.
 
-Terminal 1 - Backend:
+**Terminal 1 - Database:**
+```bash
+docker-compose up -d postgres
+```
+
+**Terminal 2 - Backend:**
 ```bash
 cd backend
 dotnet run
 ```
 
-Terminal 2 - Frontend:
+**Terminal 3 - Frontend:**
 ```bash
 cd frontend-remix
 npm install
@@ -132,12 +131,11 @@ The React Router v7 frontend will be available at `http://localhost:5173` with s
 - `dotnet test` - Run tests
 - `dotnet ef database update` - Apply database migrations
 
-### Frontend (Legacy - React + Vite)
-- `cd frontend && npm run dev` - Start development server
-- `cd frontend && npm run build` - Build for production
-- `cd frontend && npm run preview` - Preview production build
-- `cd frontend && npm run lint` - Run ESLint
-- `cd frontend && npm run type-check` - TypeScript type checking
+### Database (Docker)
+- `docker-compose up -d postgres` - Start PostgreSQL container
+- `docker-compose down` - Stop all containers
+- `docker-compose logs postgres` - View database logs
+- `docker-compose exec postgres psql -U oldenerauser -d oldenerafansite` - Connect to database
 
 ### Frontend (React Router v7) ⚡
 - `cd frontend-remix && npm run dev` - Start development server
@@ -162,6 +160,8 @@ The site features a fantasy-themed design inspired by the Heroes of Might and Ma
 - [x] React Router v7 migration with SSR
 - [x] File-based routing system
 - [x] Server-side data loading with loaders
+- [x] Docker PostgreSQL database setup
+- [x] Complete development environment
 - [x] Image storage structure and organization
 - [x] Background imagery and visual enhancements
 - [x] Production-ready architecture cleanup

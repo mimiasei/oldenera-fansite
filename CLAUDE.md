@@ -4,11 +4,12 @@
 This is a fan site for the upcoming PC game "Heroes of Might and Magic: Olden Era". The site will contain news, game information, screenshots, and community features.
 
 ## Technology Stack
-- **Backend**: ASP.NET Core (latest version)
-- **Frontend**: React.js with TypeScript
-- **Database**: PostgreSQL
-- **CSS Framework**: Tailwind CSS
-- **Build Tool**: Vite (for React frontend)
+- **Backend**: ASP.NET Core 8.0
+- **Frontend**: React Router v7 (modern Remix) with TypeScript and SSR
+- **Database**: PostgreSQL 15 in Docker container
+- **CSS Framework**: Tailwind CSS v4 with custom fantasy theme
+- **Build Tool**: React Router v7 bundler
+- **DevOps**: Docker Compose for containerization
 
 ## Project Structure
 ```
@@ -19,33 +20,43 @@ oldenerafansite/
 │   ├── Data/
 │   ├── Services/
 │   └── Program.cs
-├── frontend/               # React TypeScript frontend
-│   ├── src/
+├── frontend-remix/          # React Router v7 frontend (ACTIVE)
+│   ├── app/
 │   │   ├── components/
-│   │   ├── pages/
-│   │   ├── services/
+│   │   ├── routes/         # File-based routing with SSR
+│   │   ├── lib/           # API services
 │   │   └── types/
 │   ├── public/
 │   └── package.json
-├── database/               # Database scripts and migrations
+├── database/               # Database setup scripts
+│   ├── setup.sql
+│   └── init.sql           # Docker initialization
+├── docker-compose.yml      # PostgreSQL container
 ├── CHANGES.md             # Track all changes
 └── README.md
 ```
 
 ## Development Commands
 
+### Database (Docker)
+- `docker-compose up -d postgres` - Start PostgreSQL container
+- `docker-compose down` - Stop containers
+- `docker ps` - Check running containers
+
 ### Backend (ASP.NET Core)
-- `dotnet run` - Start development server
+- `dotnet run` - Start development server (requires PostgreSQL running)
 - `dotnet build` - Build the project
 - `dotnet test` - Run tests
-- `dotnet ef database update` - Apply database migrations
 
-### Frontend (React + Vite)
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run type-check` - Run TypeScript type checking
+### Frontend (React Router v7)
+- `cd frontend-remix && npm run dev` - Start development server
+- `cd frontend-remix && npm run build` - Build for production
+- `cd frontend-remix && npm run typecheck` - TypeScript type checking
+
+### Complete Development Setup
+1. `docker-compose up -d postgres` - Start database
+2. `cd backend && dotnet run` - Start API server
+3. `cd frontend-remix && npm run dev` - Start frontend
 
 ## Features to Implement
 1. News management system
@@ -61,9 +72,10 @@ oldenerafansite/
 - Use descriptive commit messages
 
 ## Database
-- PostgreSQL database for storing news, game info, and user data
+- PostgreSQL 15 in Docker container for development
 - Entity Framework Core for ORM
-- Migrations for database schema changes
+- Automatic database initialization with sample data
+- Docker volume for persistent data storage
 
 ## Notes
 - This is an unofficial fan site
