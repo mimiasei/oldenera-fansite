@@ -1,26 +1,27 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { newsApi } from '../services/api';
-import { NewsArticle } from '../types';
+import { useNews, useUI } from '../store';
 
 const Home = () => {
-  const [latestNews, setLatestNews] = useState<NewsArticle[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { news, setNewsData, setNewsError } = useNews();
+  const { addNotification } = useUI();
 
   useEffect(() => {
     const fetchLatestNews = async () => {
       try {
         const response = await newsApi.getAll();
-        setLatestNews(response.data.slice(0, 3)); // Get latest 3 articles
+        setNewsData(response.data.slice(0, 3), 1, 1); // Get latest 3 articles
+        addNotification('success', 'News loaded successfully!');
       } catch (error) {
         console.error('Failed to fetch latest news:', error);
-      } finally {
-        setLoading(false);
+        setNewsError('Failed to load news articles');
+        addNotification('error', 'Failed to load news articles');
       }
     };
 
     fetchLatestNews();
-  }, []);
+  }, [setNewsData, setNewsError, addNotification]);
 
   return (
     <div className="space-y-12 bg-cover bg-center bg-no-repeat"         
@@ -49,14 +50,14 @@ const Home = () => {
       {/* Latest News Section */}
       <section className="container rounded-xl mx-auto px-4 py-6" style={{ backgroundColor: `rgba(255, 255, 255, 0.05)`}}>
         <h2 className="text-gray-400 text-3xl font-bold mb-8 text-center">Latest News</h2>
-        {loading ? (
+        {news.loading ? (
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
             <p className="mt-2 text-gray-600">Loading news...</p>
           </div>
-        ) : latestNews.length > 0 ? (
+        ) : news.articles.length > 0 ? (
           <div className="grid md:grid-cols-3 gap-6">
-            {latestNews.map((article) => (
+            {news.articles.map((article) => (
               <div key={article.id} className="card hover:shadow-lg transition-shadow duration-200">
                 {article.imageUrl && (
                   <img 
@@ -88,7 +89,7 @@ const Home = () => {
           </div>
         )}
         
-        {latestNews.length > 0 && (
+        {news.articles.length > 0 && (
           <div className="text-center mt-8">
             <Link to="/news" className="btn-primary">
               View All News

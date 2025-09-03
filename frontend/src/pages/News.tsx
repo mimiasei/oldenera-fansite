@@ -1,30 +1,30 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { newsApi } from '../services/api';
-import { NewsArticle } from '../types';
+import { useNews, useUI } from '../store';
 
 const News = () => {
-  const [news, setNews] = useState<NewsArticle[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { news, fetchNews, setNewsData, setNewsError } = useNews();
+  const { addNotification } = useUI();
 
   useEffect(() => {
-    const fetchNews = async () => {
+    const loadNews = async () => {
+      fetchNews(); // Set loading state
       try {
         const response = await newsApi.getAll();
-        setNews(response.data);
+        setNewsData(response.data, 1, 1);
+        addNotification('info', 'All news articles loaded');
       } catch (error) {
-        setError('Failed to load news articles');
+        setNewsError('Failed to load news articles');
+        addNotification('error', 'Failed to load news articles');
         console.error('Failed to fetch news:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchNews();
-  }, []);
+    loadNews();
+  }, [fetchNews, setNewsData, setNewsError, addNotification]);
 
-  if (loading) {
+  if (news.loading) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
@@ -33,10 +33,10 @@ const News = () => {
     );
   }
 
-  if (error) {
+  if (news.error) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
-        <p className="text-red-600 text-lg">{error}</p>
+        <p className="text-red-600 text-lg">{news.error}</p>
       </div>
     );
   }
@@ -47,14 +47,14 @@ const News = () => {
         Latest News
       </h1>
       
-      {news.length === 0 ? (
+      {news.articles.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-600 text-lg mb-4">No news articles available yet.</p>
           <p className="text-gray-500">Check back soon for the latest updates about Heroes of Might and Magic: Olden Era!</p>
         </div>
       ) : (
         <div className="space-y-8">
-          {news.map((article) => (
+          {news.articles.map((article) => (
             <article key={article.id} className="card hover:shadow-lg transition-shadow duration-200">
               <div className="flex flex-col lg:flex-row gap-6">
                 {article.imageUrl && (

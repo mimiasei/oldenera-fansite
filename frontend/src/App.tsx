@@ -1,13 +1,16 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AppProvider } from './store';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import News from './pages/News';
+import NotificationContainer from './components/NotificationContainer';
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen flex flex-col">
+    <AppProvider>
+      <Router>
+        <div className="min-h-screen flex flex-col">
         <Header />
         
         <main className="flex-grow">
@@ -36,8 +39,10 @@ function App() {
         </main>
         
         <Footer />
-      </div>
-    </Router>
+        <NotificationContainer />
+        </div>
+      </Router>
+    </AppProvider>
   );
 }
 
