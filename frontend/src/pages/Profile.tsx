@@ -117,13 +117,13 @@ const Profile: React.FC = () => {
                 <button
                   onClick={() => setIsEditing(true)}
                   disabled={isEditing}
-                  className="btn-primary disabled:opacity-50"
+                  className="btn btn-primary disabled:opacity-50"
                 >
                   Edit Profile
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="btn-secondary bg-red-100 text-red-700 hover:bg-red-200"
+                  className="btn btn-secondary bg-red-100 text-red-700 hover:bg-red-200"
                 >
                   Sign Out
                 </button>

@@ -11,6 +11,9 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import AdminNews from './pages/AdminNews';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminUsers from './pages/AdminUsers';
+import AdminSettings from './pages/AdminSettings';
 import NewsCreate from './pages/NewsCreate';
 import NewsEdit from './pages/NewsEdit';
 import NotificationContainer from './components/NotificationContainer';
@@ -40,6 +43,21 @@ function App() {
               } />
               
               {/* Admin Routes */}
+              <Route path="/admin" element={
+                <ProtectedRoute requireModerator={true}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/dashboard" element={
+                <ProtectedRoute requireModerator={true}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/users" element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminUsers />
+                </ProtectedRoute>
+              } />
               <Route path="/admin/news" element={
                 <ProtectedRoute requireModerator={true}>
                   <AdminNews />
@@ -53,6 +71,11 @@ function App() {
               <Route path="/admin/news/edit/:id" element={
                 <ProtectedRoute requireModerator={true}>
                   <NewsEdit />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/settings" element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminSettings />
                 </ProtectedRoute>
               } />
               

@@ -35,7 +35,7 @@ const NewsEdit = () => {
         <p className="text-gray-600 mb-6">The article you're trying to edit doesn't exist.</p>
         <button 
           onClick={() => navigate('/news')}
-          className="btn-primary"
+          className="btn btn-primary"
         >
           Back to News
         </button>

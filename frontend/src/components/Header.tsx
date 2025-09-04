@@ -59,14 +59,32 @@ const Header = () => {
                     Forum
                   </Link>
                 </li>
-                {isModerator && (
-                  <li>
-                    <Link 
-                      to="/admin/news" 
-                      className="hover:text-primary-200 transition-colors duration-200 bg-white/20 px-2 py-1 rounded"
-                    >
+{isModerator && (
+                  <li className="relative group">
+                    <button className="hover:text-primary-200 transition-colors duration-200 bg-white/20 px-2 py-1 rounded flex items-center">
                       Admin
-                    </Link>
+                      <svg className="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                      <Link to="/admin/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Dashboard
+                      </Link>
+                      <Link to="/admin/news" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Manage News
+                      </Link>
+                      {user?.roles?.includes('Admin') && (
+                        <>
+                          <Link to="/admin/users" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            Manage Users
+                          </Link>
+                          <Link to="/admin/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                            Settings
+                          </Link>
+                        </>
+                      )}
+                    </div>
                   </li>
                 )}
               </ul>

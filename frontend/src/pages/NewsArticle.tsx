@@ -28,11 +28,11 @@ const NewsArticle = () => {
           <div className="space-x-4">
             <button 
               onClick={() => navigate(-1)}
-              className="btn-secondary"
+              className="btn btn-secondary"
             >
               Go Back
             </button>
-            <Link to="/news" className="btn-primary">
+            <Link to="/news" className="btn btn-primary">
               View All News
             </Link>
           </div>
@@ -143,11 +143,11 @@ const NewsArticle = () => {
             <div className="flex space-x-3">
               <button 
                 onClick={() => navigate(-1)}
-                className="btn-secondary"
+                className="btn btn-secondary"
               >
                 ← Back
               </button>
-              <Link to="/news" className="btn-primary">
+              <Link to="/news" className="btn btn-primary">
                 More News
               </Link>
             </div>

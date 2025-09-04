@@ -108,4 +108,7 @@ export const authAPI = {
   logout: () => api.post('/auth/logout'),
 };
 
+// SWR fetcher function
+export const fetcher = (url: string) => api.get(url).then(res => res.data);
+
 export default api;

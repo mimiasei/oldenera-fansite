@@ -4,15 +4,15 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 
 ## 🏰 Features
 
-- **News Management System**: Full CRUD operations for news articles with global state management
-- **Global State Management**: React Context API with TypeScript for centralized state
-- **Notification System**: Toast-style notifications with auto-dismiss functionality
+- **Complete News Management System**: Full CRUD operations for news articles with advanced search and filtering
+- **User Authentication System**: JWT-based authentication with role-based access control (Admin, Moderator, User)
+- **Enhanced Admin Panel**: Comprehensive dashboard with user management, statistics, and site settings
+- **SWR Data Fetching**: Optimal client-side caching and background data synchronization
 - **Responsive Design**: Built with Tailwind CSS and custom fantasy theme with background imagery
 - **Modern Tech Stack**: ASP.NET Core backend with React TypeScript frontend
-- **PostgreSQL Database**: Robust data storage with Entity Framework Core
-- **Image Management**: Organized storage structure for static assets and user uploads
+- **PostgreSQL Database**: Robust data storage with Entity Framework Core and ASP.NET Core Identity
+- **Security**: Production-ready authentication with password requirements and account lockout protection
 - **Type Safety**: Full TypeScript integration with custom hooks and interfaces
-- **Admin Panel**: Content management capabilities (planned)
 - **Community Features**: User comments and forum discussions (planned)
 
 ## 🛠 Technology Stack
@@ -167,13 +167,16 @@ The site features a fantasy-themed design inspired by the Heroes of Might and Ma
 - [x] Image storage structure and organization
 - [x] Background imagery and visual enhancements
 - [x] Production-ready architecture with React + SWR
-- [ ] User authentication system
+- [x] Complete user authentication system with JWT and role-based access control
+- [x] Enhanced admin panel with dashboard, user management, and site settings
+- [x] User profiles and role-based navigation
+- [x] Advanced news management with search and filtering
 - [ ] Comment system for news articles
-- [ ] Admin panel for content management
 - [ ] Image gallery for screenshots
-- [ ] Game information pages
+- [ ] Game information pages (factions, units, spells)
 - [ ] Forum/discussion system
-- [ ] User profiles and community features
+- [ ] Google OAuth integration
+- [ ] Email notifications and user engagement features
 
 ## 🤝 Contributing
 

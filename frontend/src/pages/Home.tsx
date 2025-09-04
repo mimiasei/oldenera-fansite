@@ -79,7 +79,7 @@ const Home = () => {
         
         {latestNews.length > 0 && (
           <div className="text-center mt-8">
-            <Link to="/news" className="btn-primary">
+            <Link to="/news" className="btn btn-primary">
               View All News
             </Link>
           </div>

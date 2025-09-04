@@ -84,3 +84,6 @@ oldenerafansite/
 - This is an unofficial fan site
 - All game assets and trademarks belong to their respective owners
 - Always ask user before running sudo commands
+- always update todo file after finishing sub-tasks or complete sections
+- when updating changes file for anything major, also update root readme file.
+- whenever using the classes btn-primary or btn-secondary, always use the class btn first like this: className="btn btn-primary"

@@ -41,7 +41,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           <p className="text-gray-600 mb-6">You need administrator privileges to access this page.</p>
           <button 
             onClick={() => window.history.back()}
-            className="btn-primary"
+            className="btn btn-primary"
           >
             Go Back
           </button>
@@ -58,7 +58,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           <p className="text-gray-600 mb-6">You need moderator privileges to access this page.</p>
           <button 
             onClick={() => window.history.back()}
-            className="btn-primary"
+            className="btn btn-primary"
           >
             Go Back
           </button>
@@ -75,7 +75,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           <p className="text-gray-600 mb-6">You don't have the required role to access this page.</p>
           <button 
             onClick={() => window.history.back()}
-            className="btn-primary"
+            className="btn btn-primary"
           >
             Go Back
           </button>

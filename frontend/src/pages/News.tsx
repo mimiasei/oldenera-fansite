@@ -96,7 +96,7 @@ const News = () => {
                     
                     <Link 
                       to={`/news/${article.id}`}
-                      className="btn-primary"
+                      className="btn btn-primary"
                     >
                       Read Full Article
                     </Link>
