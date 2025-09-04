@@ -10,6 +10,31 @@ const api = axios.create({
   },
 });
 
+// Request interceptor to add auth token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor to handle token expiration
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('authUser');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export interface NewsFilters {
   search?: string;
   tag?: string;
@@ -44,6 +69,43 @@ export const newsApi = {
   update: (id: number, article: Partial<NewsArticle>) => 
     api.put(`/news/${id}`, article),
   delete: (id: number) => api.delete(`/news/${id}`),
+};
+
+// Authentication interfaces
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  displayName: string;
+  profilePictureUrl?: string;
+  roles: string[];
+}
+
+export interface AuthResponse {
+  token: string;
+  user: User;
+}
+
+// Authentication API
+export const authAPI = {
+  register: (data: RegisterRequest) => api.post<AuthResponse>('/auth/register', data),
+  login: (data: LoginRequest) => api.post<AuthResponse>('/auth/login', data),
+  getCurrentUser: () => api.get<User>('/auth/me'),
+  refreshToken: () => api.post<{ token: string }>('/auth/refresh'),
+  logout: () => api.post('/auth/logout'),
 };
 
 export default api;

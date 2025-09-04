@@ -1,0 +1,105 @@
+using Microsoft.IdentityModel.Tokens;
+using OldenEraFanSite.Api.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+
+namespace OldenEraFanSite.Api.Services;
+
+public class JwtService : IJwtService
+{
+    private readonly IConfiguration _configuration;
+    private readonly ILogger<JwtService> _logger;
+
+    public JwtService(IConfiguration configuration, ILogger<JwtService> logger)
+    {
+        _configuration = configuration;
+        _logger = logger;
+    }
+
+    public string GenerateToken(User user, IList<string> roles)
+    {
+        var jwtSettings = _configuration.GetSection("JWT");
+        var secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!);
+        var issuer = jwtSettings["Issuer"];
+        var audience = jwtSettings["Audience"];
+        var expiryInMinutes = int.Parse(jwtSettings["ExpiryInMinutes"]!);
+
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, user.Id),
+            new(ClaimTypes.Name, user.UserName!),
+            new(ClaimTypes.Email, user.Email!),
+            new("firstName", user.FirstName ?? ""),
+            new("lastName", user.LastName ?? ""),
+            new("displayName", user.DisplayName),
+            new("profilePicture", user.ProfilePictureUrl ?? ""),
+            new("isActive", user.IsActive.ToString()),
+            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
+        };
+
+        // Add role claims
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.UtcNow.AddMinutes(expiryInMinutes),
+            Issuer = issuer,
+            Audience = audience,
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(secretKey),
+                SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
+    }
+
+    public bool ValidateToken(string token)
+    {
+        try
+        {
+            GetPrincipalFromToken(token);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Token validation failed");
+            return false;
+        }
+    }
+
+    public ClaimsPrincipal GetPrincipalFromToken(string token)
+    {
+        var jwtSettings = _configuration.GetSection("JWT");
+        var secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!);
+
+        var tokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(secretKey),
+            ValidateIssuer = true,
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidateAudience = true,
+            ValidAudience = jwtSettings["Audience"],
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        return tokenHandler.ValidateToken(token, tokenValidationParameters, out _);
+    }
+
+    public DateTime GetTokenExpiration(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var jsonToken = tokenHandler.ReadJwtToken(token);
+        return jsonToken.ValidTo;
+    }
+}
