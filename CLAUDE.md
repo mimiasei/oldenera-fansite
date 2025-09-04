@@ -5,10 +5,11 @@ This is a fan site for the upcoming PC game "Heroes of Might and Magic: Olden Er
 
 ## Technology Stack
 - **Backend**: ASP.NET Core 8.0
-- **Frontend**: React Router v7 (modern Remix) with TypeScript and SSR
+- **Frontend**: React 18 with Vite and TypeScript
+- **Data Fetching**: SWR (Stale-While-Revalidate) for client-side caching
 - **Database**: PostgreSQL 15 in Docker container
-- **CSS Framework**: Tailwind CSS v4 with custom fantasy theme
-- **Build Tool**: React Router v7 bundler
+- **CSS Framework**: Tailwind CSS v3 with custom fantasy theme
+- **Build Tool**: Vite for fast development and optimized builds
 - **DevOps**: Docker Compose for containerization
 
 ## Project Structure
@@ -20,11 +21,12 @@ oldenerafansite/
 │   ├── Data/
 │   ├── Services/
 │   └── Program.cs
-├── frontend-remix/          # React Router v7 frontend (ACTIVE)
-│   ├── app/
+├── frontend/               # React + Vite frontend with SWR (ACTIVE)
+│   ├── src/
 │   │   ├── components/
-│   │   ├── routes/         # File-based routing with SSR
-│   │   ├── lib/           # API services
+│   │   ├── pages/
+│   │   ├── hooks/         # SWR custom hooks
+│   │   ├── services/      # API services
 │   │   └── types/
 │   ├── public/
 │   └── package.json
@@ -48,15 +50,16 @@ oldenerafansite/
 - `dotnet build` - Build the project
 - `dotnet test` - Run tests
 
-### Frontend (React Router v7)
-- `cd frontend-remix && npm run dev` - Start development server
-- `cd frontend-remix && npm run build` - Build for production
-- `cd frontend-remix && npm run typecheck` - TypeScript type checking
+### Frontend (React + SWR)
+- `cd frontend && npm run dev` - Start development server
+- `cd frontend && npm run build` - Build for production
+- `cd frontend && npm run lint` - Run ESLint
+- `cd frontend && npm run type-check` - TypeScript type checking
 
 ### Complete Development Setup
 1. `docker-compose up -d postgres` - Start database
 2. `cd backend && dotnet run` - Start API server
-3. `cd frontend-remix && npm run dev` - Start frontend
+3. `cd frontend && npm run dev` - Start frontend
 
 ## Features to Implement
 1. News management system

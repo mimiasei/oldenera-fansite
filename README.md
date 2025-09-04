@@ -18,11 +18,11 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 ## 🛠 Technology Stack
 
 - **Backend**: ASP.NET Core 8.0
-- **Frontend**: React Router v7 (modern Remix) with TypeScript and SSR ⚡
+- **Frontend**: React 18 with Vite and TypeScript ⚡
 - **Database**: PostgreSQL 15 in Docker container with Entity Framework Core
-- **State Management**: React Router v7 loaders with server-side data fetching
-- **Styling**: Tailwind CSS v4 with custom fantasy theme and background imagery
-- **Build Tool**: React Router v7 bundler
+- **Data Fetching**: SWR (Stale-While-Revalidate) for client-side caching and revalidation
+- **Styling**: Tailwind CSS v3 with custom fantasy theme and background imagery
+- **Build Tool**: Vite for fast development and optimized builds
 - **API**: RESTful API with Swagger documentation
 - **DevOps**: Docker Compose for database containerization
 
@@ -35,7 +35,18 @@ oldenerafansite/
 │   ├── Models/             # Data models
 │   ├── Data/               # Database context
 │   └── Program.cs          # Application entry point
-├── frontend-remix/         # React Router v7 frontend with SSR ⚡ (ACTIVE)
+├── frontend/               # React + Vite frontend with SWR ⚡ (ACTIVE)
+│   ├── src/
+│   │   ├── components/     # Reusable UI components
+│   │   ├── pages/          # Page components
+│   │   ├── hooks/          # SWR custom hooks for data fetching
+│   │   ├── services/       # API service layer
+│   │   ├── store/          # Global state management
+│   │   ├── types/          # TypeScript type definitions
+│   │   └── assets/images/  # Build-processed images
+│   ├── public/images/      # Static image assets
+│   └── package.json        # Frontend dependencies
+├── frontend-remix/         # React Router v7 frontend (EXPERIMENTAL)
 │   ├── app/
 │   │   ├── components/     # React Router v7 components
 │   │   ├── lib/            # API services and utilities
@@ -43,16 +54,6 @@ oldenerafansite/
 │   │   └── types/          # TypeScript interfaces
 │   ├── public/             # Static assets
 │   └── package.json        # React Router v7 dependencies
-├── frontend/               # Legacy React TypeScript frontend (DEPRECATED)
-│   ├── src/
-│   │   ├── components/     # Reusable UI components
-│   │   ├── pages/          # Page components
-│   │   ├── services/       # API service layer
-│   │   ├── store/          # Global state management
-│   │   ├── types/          # TypeScript type definitions
-│   │   └── assets/images/  # Build-processed images
-│   ├── public/images/      # Static image assets
-│   └── package.json        # Frontend dependencies
 ├── database/               # Database setup scripts
 │   ├── setup.sql          # Database schema and sample data
 │   ├── init.sql           # Docker database initialization
@@ -99,7 +100,7 @@ dotnet run
 
 The API will be available at `https://localhost:5001` with Swagger documentation.
 
-### Frontend Setup (React Router v7) ⚡
+### Frontend Setup (React + SWR) ⚡
 
 **IMPORTANT**: Start services in order for proper operation.
 
@@ -116,12 +117,12 @@ dotnet run
 
 **Terminal 3 - Frontend:**
 ```bash
-cd frontend-remix
+cd frontend
 npm install
 npm run dev
 ```
 
-The React Router v7 frontend will be available at `http://localhost:5173` with server-side rendering.
+The React frontend will be available at `http://localhost:5173` with SWR data fetching and caching.
 
 ## 🧪 Development Commands
 
@@ -137,11 +138,12 @@ The React Router v7 frontend will be available at `http://localhost:5173` with s
 - `docker-compose logs postgres` - View database logs
 - `docker-compose exec postgres psql -U oldenerauser -d oldenerafansite` - Connect to database
 
-### Frontend (React Router v7) ⚡
-- `cd frontend-remix && npm run dev` - Start development server
-- `cd frontend-remix && npm run build` - Build for production
-- `cd frontend-remix && npm run start` - Start production server
-- `cd frontend-remix && npm run typecheck` - TypeScript type checking
+### Frontend (React + SWR) ⚡
+- `cd frontend && npm run dev` - Start development server
+- `cd frontend && npm run build` - Build for production
+- `cd frontend && npm run preview` - Preview production build
+- `cd frontend && npm run lint` - Run ESLint
+- `cd frontend && npm run type-check` - TypeScript type checking
 
 ## 🎨 Design
 
@@ -156,15 +158,15 @@ The site features a fantasy-themed design inspired by the Heroes of Might and Ma
 - [x] Basic project setup and structure
 - [x] News management system
 - [x] Responsive UI with fantasy theme
-- [x] Global state management with React Context (legacy)
-- [x] React Router v7 migration with SSR
-- [x] File-based routing system
-- [x] Server-side data loading with loaders
+- [x] Global state management with React Context
+- [x] SWR implementation for optimal data fetching
+- [x] Client-side caching and background updates
+- [x] Custom hooks for data management
 - [x] Docker PostgreSQL database setup
 - [x] Complete development environment
 - [x] Image storage structure and organization
 - [x] Background imagery and visual enhancements
-- [x] Production-ready architecture cleanup
+- [x] Production-ready architecture with React + SWR
 - [ ] User authentication system
 - [ ] Comment system for news articles
 - [ ] Admin panel for content management

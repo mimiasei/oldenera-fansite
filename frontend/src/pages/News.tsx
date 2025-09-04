@@ -1,30 +1,10 @@
-import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { newsApi } from '../services/api';
-import { useNews, useUI } from '../store';
+import { useNews } from '../hooks/useSWR';
 
 const News = () => {
-  const { news, fetchNews, setNewsData, setNewsError } = useNews();
-  const { addNotification } = useUI();
+  const { news, isLoading, isError, error } = useNews();
 
-  useEffect(() => {
-    const loadNews = async () => {
-      fetchNews(); // Set loading state
-      try {
-        const response = await newsApi.getAll();
-        setNewsData(response.data, 1, 1);
-        addNotification('info', 'All news articles loaded');
-      } catch (error) {
-        setNewsError('Failed to load news articles');
-        addNotification('error', 'Failed to load news articles');
-        console.error('Failed to fetch news:', error);
-      }
-    };
-
-    loadNews();
-  }, [fetchNews, setNewsData, setNewsError, addNotification]);
-
-  if (news.loading) {
+  if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
@@ -33,10 +13,13 @@ const News = () => {
     );
   }
 
-  if (news.error) {
+  if (isError) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
-        <p className="text-red-600 text-lg">{news.error}</p>
+        <p className="text-red-600 text-lg">Failed to load news articles</p>
+        <p className="text-sm text-gray-500 mt-2">
+          Make sure the ASP.NET Core backend is running: <code className="bg-gray-200 px-2 py-1 rounded">cd backend && dotnet run</code>
+        </p>
       </div>
     );
   }
@@ -47,14 +30,14 @@ const News = () => {
         Latest News
       </h1>
       
-      {news.articles.length === 0 ? (
+      {news.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-600 text-lg mb-4">No news articles available yet.</p>
           <p className="text-gray-500">Check back soon for the latest updates about Heroes of Might and Magic: Olden Era!</p>
         </div>
       ) : (
         <div className="space-y-8">
-          {news.articles.map((article) => (
+          {news.map((article) => (
             <article key={article.id} className="card hover:shadow-lg transition-shadow duration-200">
               <div className="flex flex-col lg:flex-row gap-6">
                 {article.imageUrl && (

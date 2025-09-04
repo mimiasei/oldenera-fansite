@@ -278,3 +278,61 @@
 - **Type Safety**: All TypeScript issues resolved with proper type annotations
 - **Development Workflow**: Streamlined three-terminal setup (Docker, backend, frontend)
 - **Production Ready**: Clean architecture without workarounds or temporary fixes
+
+## 2025-09-03 (Part 5)
+
+### Frontend Architecture Decision: Revert to React + SWR
+- **Architecture Reevaluation**: Recognized that Remix/React Router v7 benefits (SSR, loaders, actions) are minimal when using ASP.NET Core backend
+- **SWR Implementation**: Switched to React + Vite with SWR (Stale-While-Revalidate) for optimal client-side data fetching
+- **Performance Benefits**: SWR provides superior caching, background updates, and deduplication for API-heavy applications
+- **Simplified Architecture**: Removed unnecessary SSR complexity in favor of efficient client-side data management
+
+### SWR Integration and Custom Hooks
+- **SWR Installation**: Added SWR 2.3.6 to React frontend dependencies
+- **Custom Hook Development**: Created comprehensive `src/hooks/useSWR.ts` with:
+  - `useNews()` - All news articles with automatic caching and revalidation
+  - `useNewsArticle(id)` - Individual article fetching with conditional loading
+  - `useLatestNews()` - Homepage latest 3 articles with optimized performance
+  - Built-in error handling, loading states, and background updates
+- **Configuration Options**: Implemented SWR with optimized settings:
+  - 30-second deduplication interval for performance
+  - Disabled revalidateOnFocus for better UX
+  - Enabled revalidateOnReconnect for data freshness
+
+### Component Updates for SWR
+- **Home Component**: Completely refactored to use `useLatestNews()` hook
+  - Removed complex useEffect and global state dependencies
+  - Added proper error handling with helpful backend startup instructions
+  - Simplified loading and error states with SWR's built-in states
+- **News Component**: Updated to use `useNews()` hook
+  - Eliminated manual API calls and state management
+  - Improved error messaging and user feedback
+  - Streamlined component logic with SWR's declarative approach
+
+### Removed Global State Complexity
+- **State Management Simplification**: Eliminated complex React Context + useReducer global state
+- **SWR Built-in Features**: Leveraging SWR's automatic:
+  - Request deduplication across components
+  - Background data synchronization
+  - Automatic cache invalidation and updates
+  - Error retry logic and recovery
+- **Performance Optimization**: Reduced bundle size and complexity while improving data consistency
+
+### Development Environment Configuration
+- **Environment Variables**: Added `.env` file to React frontend with proper API configuration
+- **API Integration**: Maintained existing axios setup with SWR fetcher functions
+- **Backend Compatibility**: Preserved all existing ASP.NET Core API endpoints and functionality
+
+### Architecture Benefits for ASP.NET Core + React Stack
+- **Optimal Separation**: ASP.NET Core handles business logic, React handles UI/UX
+- **Caching Strategy**: SWR provides client-side caching without server-side complexity
+- **Development Speed**: Faster development cycles with hot reload and client-side updates
+- **Scalability**: Better performance for API-heavy applications with smart caching
+- **Simplicity**: Cleaner architecture with fewer moving parts and dependencies
+
+### Status
+- **Optimal Architecture**: React + SWR + ASP.NET Core stack perfectly aligned for project needs
+- **Superior Performance**: Client-side caching and background updates provide excellent UX
+- **Development Ready**: Streamlined development workflow with three-service setup
+- **Production Optimized**: Clean, maintainable codebase with proper separation of concerns
+- **Modern Stack**: Latest React patterns with SWR for data fetching best practices
