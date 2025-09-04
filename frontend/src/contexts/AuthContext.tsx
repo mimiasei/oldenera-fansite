@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { authAPI, UpdateProfileRequest } from '../services/api';
 
 interface User {
   id: string;
@@ -15,6 +16,7 @@ interface AuthContextType {
   token: string | null;
   login: (token: string, user: User) => void;
   logout: () => void;
+  updateProfile: (data: UpdateProfileRequest) => Promise<void>;
   isLoading: boolean;
   isAuthenticated: boolean;
   hasRole: (role: string) => boolean;
@@ -74,6 +76,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('authUser');
   };
 
+  const updateProfile = async (data: UpdateProfileRequest) => {
+    try {
+      const response = await authAPI.updateProfile(data);
+      const updatedUser = response.data;
+      setUser(updatedUser);
+      localStorage.setItem('authUser', JSON.stringify(updatedUser));
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const hasRole = (role: string): boolean => {
     return user?.roles?.includes(role) ?? false;
   };
@@ -88,6 +101,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       token,
       login,
       logout,
+      updateProfile,
       isLoading,
       isAuthenticated,
       hasRole,

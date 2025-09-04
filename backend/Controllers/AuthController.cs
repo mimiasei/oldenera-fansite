@@ -234,6 +234,62 @@ public class AuthController : ControllerBase
         }
     }
 
+    [HttpPut("profile")]
+    [Authorize]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            // Update profile information
+            user.FirstName = request.FirstName?.Trim();
+            user.LastName = request.LastName?.Trim();
+            user.ProfilePictureUrl = request.ProfilePictureUrl?.Trim();
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest(new { message = "Failed to update profile", errors = result.Errors });
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            _logger.LogInformation("User {UserId} updated their profile", userId);
+
+            return Ok(new UserDto
+            {
+                Id = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                DisplayName = user.DisplayName,
+                ProfilePictureUrl = user.ProfilePictureUrl,
+                Roles = roles.ToList()
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Profile update failed for user {UserId}", User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            return StatusCode(500, new { message = "Failed to update profile" });
+        }
+    }
+
     // TODO: Implement Google OAuth login endpoint
     // [HttpPost("google")]
     // public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequest request)
@@ -256,6 +312,13 @@ public class LoginRequest
 {
     public string Email { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
+}
+
+public class UpdateProfileRequest
+{
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
+    public string? ProfilePictureUrl { get; set; }
 }
 
 public class AuthResponse

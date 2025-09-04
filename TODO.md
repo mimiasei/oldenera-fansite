@@ -11,6 +11,7 @@
 - [x] Implement user roles (Admin, Moderator, User)
 - [x] Add authentication middleware and route protection
 - [x] Create user profile pages
+- [x] Add user profile editing functionality (first name, last name, profile picture)
 
 ### 2. Enhanced Admin Panel
 - [x] Build admin dashboard with site statistics

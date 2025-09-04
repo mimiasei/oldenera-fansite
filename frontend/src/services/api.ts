@@ -99,11 +99,18 @@ export interface AuthResponse {
   user: User;
 }
 
+export interface UpdateProfileRequest {
+  firstName?: string;
+  lastName?: string;
+  profilePictureUrl?: string;
+}
+
 // Authentication API
 export const authAPI = {
   register: (data: RegisterRequest) => api.post<AuthResponse>('/auth/register', data),
   login: (data: LoginRequest) => api.post<AuthResponse>('/auth/login', data),
   getCurrentUser: () => api.get<User>('/auth/me'),
+  updateProfile: (data: UpdateProfileRequest) => api.put<User>('/auth/profile', data),
   refreshToken: () => api.post<{ token: string }>('/auth/refresh'),
   logout: () => api.post('/auth/logout'),
 };
