@@ -17,12 +17,67 @@ public class NewsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<NewsArticle>>> GetNews()
+    public async Task<ActionResult<IEnumerable<NewsArticle>>> GetNews(
+        [FromQuery] string? search = null,
+        [FromQuery] string? tag = null,
+        [FromQuery] string? author = null,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
     {
-        return await _context.NewsArticles
-            .Where(n => n.IsPublished)
+        var query = _context.NewsArticles
+            .Where(n => n.IsPublished);
+
+        // Apply search filter
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            query = query.Where(n => 
+                n.Title.Contains(search) ||
+                n.Summary.Contains(search) ||
+                n.Content.Contains(search));
+        }
+
+        // Apply tag filter
+        if (!string.IsNullOrWhiteSpace(tag))
+        {
+            query = query.Where(n => n.Tags.Contains(tag));
+        }
+
+        // Apply author filter
+        if (!string.IsNullOrWhiteSpace(author))
+        {
+            query = query.Where(n => n.Author.Contains(author));
+        }
+
+        // Apply pagination and ordering
+        var articles = await query
             .OrderByDescending(n => n.PublishedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+
+        // Get total count for pagination info
+        var totalCount = await query.CountAsync();
+        
+        Response.Headers["X-Total-Count"] = totalCount.ToString();
+        Response.Headers["X-Page"] = page.ToString();
+        Response.Headers["X-Page-Size"] = pageSize.ToString();
+        Response.Headers["X-Total-Pages"] = ((int)Math.Ceiling((double)totalCount / pageSize)).ToString();
+
+        return Ok(articles);
+    }
+
+    [HttpGet("filters")]
+    public async Task<ActionResult<object>> GetFilters()
+    {
+        var articles = await _context.NewsArticles
+            .Where(n => n.IsPublished)
+            .Select(n => new { n.Tags, n.Author })
+            .ToListAsync();
+
+        var tags = articles.SelectMany(a => a.Tags).Distinct().OrderBy(t => t).ToList();
+        var authors = articles.Select(a => a.Author).Distinct().OrderBy(a => a).ToList();
+
+        return Ok(new { tags, authors });
     }
 
     [HttpGet("{id}")]

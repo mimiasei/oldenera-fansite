@@ -1,11 +1,16 @@
 import useSWR from 'swr';
-import { newsApi } from '../services/api';
+import { newsApi, NewsFilters } from '../services/api';
 import { NewsArticle } from '../types';
 
 // Fetcher functions for SWR
 const fetchers = {
-  getAllNews: async (): Promise<NewsArticle[]> => {
-    const response = await newsApi.getAll();
+  getAllNews: async (filters: NewsFilters = {}): Promise<NewsArticle[]> => {
+    const response = await newsApi.getAll(filters);
+    return response.data;
+  },
+  
+  getFilters: async (): Promise<{ tags: string[], authors: string[] }> => {
+    const response = await newsApi.getFilters();
     return response.data;
   },
   
@@ -16,12 +21,17 @@ const fetchers = {
 };
 
 // Custom hooks using SWR
-export const useNews = () => {
-  const { data, error, isLoading, mutate } = useSWR('/news', fetchers.getAllNews, {
-    revalidateOnFocus: false,
-    revalidateOnReconnect: true,
-    dedupingInterval: 30000, // 30 seconds
-  });
+export const useNews = (filters: NewsFilters = {}) => {
+  const filtersKey = JSON.stringify(filters);
+  const { data, error, isLoading, mutate } = useSWR(
+    ['/news', filtersKey], 
+    () => fetchers.getAllNews(filters), 
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 30000, // 30 seconds
+    }
+  );
 
   return {
     news: data || [],
@@ -29,6 +39,21 @@ export const useNews = () => {
     isError: !!error,
     error,
     refetch: mutate,
+  };
+};
+
+export const useNewsFilters = () => {
+  const { data, error, isLoading } = useSWR('/news/filters', fetchers.getFilters, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: true,
+    dedupingInterval: 300000, // 5 minutes - filters don't change often
+  });
+
+  return {
+    filters: data || { tags: [], authors: [] },
+    isLoading,
+    isError: !!error,
+    error,
   };
 };
 

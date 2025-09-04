@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useLatestNews } from '../hooks/useSWR';
 
 const Home = () => {
-  const { latestNews, isLoading, isError, error } = useLatestNews();
+  const { latestNews, isLoading, isError } = useLatestNews();
 
   return (
     <div className="space-y-12 bg-cover bg-center bg-no-repeat"         

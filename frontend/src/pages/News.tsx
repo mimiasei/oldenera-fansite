@@ -1,8 +1,12 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNews } from '../hooks/useSWR';
+import { NewsFilters } from '../services/api';
+import NewsSearch from '../components/NewsSearch';
 
 const News = () => {
-  const { news, isLoading, isError, error } = useNews();
+  const [filters, setFilters] = useState<NewsFilters>({});
+  const { news, isLoading, isError } = useNews(filters);
 
   if (isLoading) {
     return (
@@ -29,6 +33,11 @@ const News = () => {
       <h1 className="text-4xl font-bold mb-8 text-center font-fantasy">
         Latest News
       </h1>
+      
+      <NewsSearch 
+        filters={filters} 
+        onFiltersChange={setFilters}
+      />
       
       {news.length === 0 ? (
         <div className="text-center py-12">

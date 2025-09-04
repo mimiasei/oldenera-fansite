@@ -4,6 +4,10 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
 import News from './pages/News';
+import NewsArticle from './pages/NewsArticle';
+import AdminNews from './pages/AdminNews';
+import NewsCreate from './pages/NewsCreate';
+import NewsEdit from './pages/NewsEdit';
 import NotificationContainer from './components/NotificationContainer';
 
 function App() {
@@ -17,6 +21,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/news" element={<News />} />
+            <Route path="/news/:id" element={<NewsArticle />} />
             <Route path="/game-info" element={
               <div className="container mx-auto px-4 py-8 text-center">
                 <h1 className="text-4xl font-bold mb-6 font-fantasy">Factions</h1>
@@ -35,6 +40,11 @@ function App() {
                       <p className="text-lg text-gray-600">Forum coming soon...</p>
                   </div>
               } />
+              
+              {/* Admin Routes */}
+              <Route path="/admin/news" element={<AdminNews />} />
+              <Route path="/admin/news/create" element={<NewsCreate />} />
+              <Route path="/admin/news/edit/:id" element={<NewsEdit />} />
           </Routes>
         </main>
         
