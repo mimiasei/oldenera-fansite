@@ -87,3 +87,5 @@ oldenerafansite/
 - always update todo file after finishing sub-tasks or complete sections
 - when updating changes file for anything major, also update root readme file.
 - whenever using the classes btn-primary or btn-secondary, always use the class btn first like this: className="btn btn-primary"
+- when I say "update files" then update the todo, changes and root readme files.
+- when I say "do git" then commit and push

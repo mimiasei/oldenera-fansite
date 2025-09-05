@@ -73,7 +73,7 @@ const Profile: React.FC = () => {
   const handleAvatarSelect = (avatarPath: string) => {
     setFormData(prev => ({
       ...prev,
-      profilePictureUrl: avatarPath
+      profilePictureUrl: avatarPath || undefined // Convert empty string to undefined
     }));
   };
 

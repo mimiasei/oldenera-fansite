@@ -12,6 +12,9 @@
 - [x] Add authentication middleware and route protection
 - [x] Create user profile pages
 - [x] Add user profile editing functionality (first name, last name, profile picture)
+- [x] Add comprehensive validation feedback for ASP.NET Core Identity requirements
+- [x] Add password visibility toggles with eye icons in all password fields
+- [x] Add fantasy-themed avatar selection with 56 Heroes of Might and Magic avatars
 
 ### 2. Enhanced Admin Panel
 - [x] Build admin dashboard with site statistics
@@ -122,6 +125,12 @@
 - [x] User profile pages with account information
 - [x] Authentication-aware navigation and UI
 - [x] Google OAuth foundation prepared for future implementation
+- [x] Comprehensive validation feedback with real-time password requirements
+- [x] Password visibility toggles with eye icons in login/register forms
+- [x] Fantasy avatar selection with 56 themed character portraits
+- [x] Avatar removal and fallback to user initials
+- [x] Client-side and server-side validation error parsing
+- [x] Account lockout handling and user-friendly error messages
 
 ### Enhanced Admin Panel
 - [x] Comprehensive admin dashboard with user/news statistics

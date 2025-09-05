@@ -260,7 +260,10 @@ public class AuthController : ControllerBase
             // Update profile information
             user.FirstName = request.FirstName?.Trim();
             user.LastName = request.LastName?.Trim();
-            user.ProfilePictureUrl = request.ProfilePictureUrl?.Trim();
+            
+            // Handle profile picture URL - convert empty strings to null
+            var trimmedUrl = request.ProfilePictureUrl?.Trim();
+            user.ProfilePictureUrl = string.IsNullOrEmpty(trimmedUrl) ? null : trimmedUrl;
 
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)

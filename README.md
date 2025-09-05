@@ -5,8 +5,11 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 ## 🏰 Features
 
 - **Complete News Management System**: Full CRUD operations for news articles with advanced search and filtering
-- **User Authentication System**: JWT-based authentication with role-based access control (Admin, Moderator, User)
+- **Advanced User Authentication System**: JWT-based authentication with role-based access control and comprehensive UX
+- **Fantasy Avatar System**: 56 Heroes of Might and Magic themed character portraits with category selection
 - **Enhanced Admin Panel**: Comprehensive dashboard with user management, statistics, and site settings
+- **Professional Validation**: Real-time password requirements with visual feedback and error handling
+- **Password Visibility Controls**: Eye icon toggles in all password fields for better user experience
 - **SWR Data Fetching**: Optimal client-side caching and background data synchronization
 - **Responsive Design**: Built with Tailwind CSS and custom fantasy theme with background imagery
 - **Modern Tech Stack**: ASP.NET Core backend with React TypeScript frontend
