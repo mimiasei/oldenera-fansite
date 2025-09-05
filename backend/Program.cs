@@ -15,8 +15,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Add Entity Framework and PostgreSQL
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+    ?? Environment.GetEnvironmentVariable("DATABASE_URL");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(connectionString));
 
 // Add Identity
 builder.Services.AddIdentity<User, IdentityRole>(options =>
@@ -46,7 +48,10 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 
 // Add JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JWT");
-var secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!);
+var secretKey = Encoding.UTF8.GetBytes(
+    jwtSettings["SecretKey"] 
+    ?? Environment.GetEnvironmentVariable("JWT_SECRET_KEY") 
+    ?? throw new InvalidOperationException("JWT SecretKey not configured"));
 
 builder.Services.AddAuthentication(options =>
 {
@@ -56,7 +61,7 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false; // Set to true in production
+    options.RequireHttpsMetadata = builder.Environment.IsProduction();
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -85,11 +90,21 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
-        builder =>
+        corsBuilder =>
         {
-            builder.WithOrigins("http://localhost:5173", "http://localhost:3000")
-                   .AllowAnyHeader()
-                   .AllowAnyMethod();
+            if (builder.Environment.IsDevelopment())
+            {
+                corsBuilder.WithOrigins("http://localhost:5173", "http://localhost:3000")
+                           .AllowAnyHeader()
+                           .AllowAnyMethod();
+            }
+            else
+            {
+                // Configure for production - update with your actual frontend domain
+                corsBuilder.WithOrigins("https://oldenerafansite-frontend.onrender.com")
+                           .AllowAnyHeader()
+                           .AllowAnyMethod();
+            }
         });
 });
 
