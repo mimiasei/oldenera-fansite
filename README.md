@@ -4,18 +4,19 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 
 ## 🏰 Features
 
+- **Complete Game Information System**: Full infrastructure for factions, units, heroes, and spells with REST API
 - **Complete News Management System**: Full CRUD operations for news articles with advanced search and filtering
 - **Advanced User Authentication System**: JWT-based authentication with role-based access control and comprehensive UX
 - **Fantasy Avatar System**: 56 Heroes of Might and Magic themed character portraits with category selection
 - **Enhanced Admin Panel**: Comprehensive dashboard with user management, statistics, and site settings
-- **Professional Validation**: Real-time password requirements with visual feedback and error handling
-- **Password Visibility Controls**: Eye icon toggles in all password fields for better user experience
-- **SWR Data Fetching**: Optimal client-side caching and background data synchronization
+- **Game Content Database**: PostgreSQL schema with faction data (Haven, Necropolis, Inferno) ready for expansion
+- **Professional API Design**: RESTful architecture with filtering, pagination, and admin-only endpoints
+- **SWR Data Fetching**: Optimal client-side caching with custom hooks for game content management
+- **Type-Safe Development**: Complete TypeScript coverage for all game models and API interactions
 - **Responsive Design**: Built with Tailwind CSS and custom fantasy theme with background imagery
 - **Modern Tech Stack**: ASP.NET Core backend with React TypeScript frontend
 - **PostgreSQL Database**: Robust data storage with Entity Framework Core and ASP.NET Core Identity
 - **Security**: Production-ready authentication with password requirements and account lockout protection
-- **Type Safety**: Full TypeScript integration with custom hooks and interfaces
 - **Community Features**: User comments and forum discussions (planned)
 
 ## 🛠 Technology Stack
@@ -34,9 +35,9 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 ```
 oldenerafansite/
 ├── backend/                 # ASP.NET Core API
-│   ├── Controllers/         # API controllers
-│   ├── Models/             # Data models
-│   ├── Data/               # Database context
+│   ├── Controllers/         # API controllers (News, Faction, Unit, GameInfo, Admin, Auth)
+│   ├── Models/             # Data models (Faction, Unit, Hero, Spell, GameInfo)
+│   ├── Data/               # Database context with game content tables
 │   └── Program.cs          # Application entry point
 ├── frontend/               # React + Vite frontend with SWR ⚡ (ACTIVE)
 │   ├── src/
@@ -60,6 +61,7 @@ oldenerafansite/
 ├── database/               # Database setup scripts
 │   ├── setup.sql          # Database schema and sample data
 │   ├── init.sql           # Docker database initialization
+│   ├── add-game-content-tables.sql # Game content schema and faction data
 │   └── README.md          # Database setup instructions
 ├── docker-compose.yml      # PostgreSQL Docker container setup
 ├── backend/wwwroot/        # Static files served by backend
@@ -174,9 +176,13 @@ The site features a fantasy-themed design inspired by the Heroes of Might and Ma
 - [x] Enhanced admin panel with dashboard, user management, and site settings
 - [x] User profiles and role-based navigation
 - [x] Advanced news management with search and filtering
+- [x] Complete game information system infrastructure (backend API, database, frontend types)
+- [x] Game content models (Faction, Unit, Hero, Spell) with sample faction data
+- [x] SWR hooks and API services for optimal game content data fetching
+- [ ] Faction overview pages and unit/hero displays (in progress)
+- [ ] Game information admin interface for content management
 - [ ] Comment system for news articles
 - [ ] Image gallery for screenshots
-- [ ] Game information pages (factions, units, spells)
 - [ ] Forum/discussion system
 - [ ] Google OAuth integration
 - [ ] Email notifications and user engagement features

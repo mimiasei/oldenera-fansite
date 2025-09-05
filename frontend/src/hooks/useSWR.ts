@@ -1,6 +1,23 @@
 import useSWR from 'swr';
-import { newsApi, NewsFilters } from '../services/api';
-import { NewsArticle } from '../types';
+import { 
+  newsApi, 
+  NewsFilters, 
+  factionApi, 
+  FactionFilters, 
+  unitApi, 
+  UnitApiFilters, 
+  gameInfoApi, 
+  GameInfoFilters 
+} from '../services/api';
+import { 
+  NewsArticle, 
+  Faction, 
+  Unit, 
+  GameInfo, 
+  Hero, 
+  UnitFilters, 
+  GameInfoCategory 
+} from '../types';
 
 // Fetcher functions for SWR
 const fetchers = {
@@ -16,6 +33,69 @@ const fetchers = {
   
   getNewsById: async (id: number): Promise<NewsArticle> => {
     const response = await newsApi.getById(id);
+    return response.data;
+  },
+
+  // Faction fetchers
+  getAllFactions: async (filters: FactionFilters = {}): Promise<Faction[]> => {
+    const response = await factionApi.getAll(filters);
+    return response.data;
+  },
+  
+  getFactionById: async (id: number, filters: FactionFilters = {}): Promise<Faction> => {
+    const response = await factionApi.getById(id, filters);
+    return response.data;
+  },
+  
+  getFactionUnits: async (factionId: number, tier?: number, unitType?: string): Promise<Unit[]> => {
+    const response = await factionApi.getUnits(factionId, tier, unitType);
+    return response.data;
+  },
+  
+  getFactionHeroes: async (factionId: number, heroClass?: string, heroType?: string): Promise<Hero[]> => {
+    const response = await factionApi.getHeroes(factionId, heroClass, heroType);
+    return response.data;
+  },
+
+  // Unit fetchers
+  getAllUnits: async (filters: UnitApiFilters = {}): Promise<Unit[]> => {
+    const response = await unitApi.getAll(filters);
+    return response.data;
+  },
+  
+  getUnitById: async (id: number, includeUpgrades = false): Promise<Unit> => {
+    const response = await unitApi.getById(id, includeUpgrades);
+    return response.data;
+  },
+  
+  getUnitFilters: async (): Promise<UnitFilters> => {
+    const response = await unitApi.getFilters();
+    return response.data;
+  },
+
+  // Game Info fetchers
+  getAllGameInfo: async (filters: GameInfoFilters = {}): Promise<GameInfo[]> => {
+    const response = await gameInfoApi.getAll(filters);
+    return response.data;
+  },
+  
+  getGameInfoById: async (id: number): Promise<GameInfo> => {
+    const response = await gameInfoApi.getById(id);
+    return response.data;
+  },
+  
+  getGameInfoBySlug: async (slug: string): Promise<GameInfo> => {
+    const response = await gameInfoApi.getBySlug(slug);
+    return response.data;
+  },
+  
+  getGameInfoCategories: async (): Promise<GameInfoCategory[]> => {
+    const response = await gameInfoApi.getCategories();
+    return response.data;
+  },
+  
+  getFeaturedGameInfo: async (limit = 6): Promise<GameInfo[]> => {
+    const response = await gameInfoApi.getFeatured(limit);
     return response.data;
   },
 };
@@ -86,5 +166,240 @@ export const useLatestNews = () => {
     isError,
     error,
     refetch,
+  };
+};
+
+// ============== GAME CONTENT HOOKS ==============
+
+// Faction hooks
+export const useFactions = (filters: FactionFilters = {}) => {
+  const filtersKey = JSON.stringify(filters);
+  const { data, error, isLoading, mutate } = useSWR(
+    ['/factions', filtersKey], 
+    () => fetchers.getAllFactions(filters), 
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 60000, // 1 minute - faction data doesn't change often
+    }
+  );
+
+  return {
+    factions: data || [],
+    isLoading,
+    isError: !!error,
+    error,
+    refetch: mutate,
+  };
+};
+
+export const useFaction = (id: number, filters: FactionFilters = {}) => {
+  const filtersKey = JSON.stringify(filters);
+  const { data, error, isLoading, mutate } = useSWR(
+    id ? ['/faction', id, filtersKey] : null,
+    () => fetchers.getFactionById(id, filters),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+    }
+  );
+
+  return {
+    faction: data,
+    isLoading,
+    isError: !!error,
+    error,
+    refetch: mutate,
+  };
+};
+
+export const useFactionUnits = (factionId: number, tier?: number, unitType?: string) => {
+  const { data, error, isLoading, mutate } = useSWR(
+    factionId ? ['/faction-units', factionId, tier, unitType] : null,
+    () => fetchers.getFactionUnits(factionId, tier, unitType),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 60000,
+    }
+  );
+
+  return {
+    units: data || [],
+    isLoading,
+    isError: !!error,
+    error,
+    refetch: mutate,
+  };
+};
+
+export const useFactionHeroes = (factionId: number, heroClass?: string, heroType?: string) => {
+  const { data, error, isLoading, mutate } = useSWR(
+    factionId ? ['/faction-heroes', factionId, heroClass, heroType] : null,
+    () => fetchers.getFactionHeroes(factionId, heroClass, heroType),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 60000,
+    }
+  );
+
+  return {
+    heroes: data || [],
+    isLoading,
+    isError: !!error,
+    error,
+    refetch: mutate,
+  };
+};
+
+// Unit hooks
+export const useUnits = (filters: UnitApiFilters = {}) => {
+  const filtersKey = JSON.stringify(filters);
+  const { data, error, isLoading, mutate } = useSWR(
+    ['/units', filtersKey], 
+    () => fetchers.getAllUnits(filters), 
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 30000,
+    }
+  );
+
+  return {
+    units: data || [],
+    isLoading,
+    isError: !!error,
+    error,
+    refetch: mutate,
+  };
+};
+
+export const useUnit = (id: number, includeUpgrades = false) => {
+  const { data, error, isLoading, mutate } = useSWR(
+    id ? ['/unit', id, includeUpgrades] : null,
+    () => fetchers.getUnitById(id, includeUpgrades),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+    }
+  );
+
+  return {
+    unit: data,
+    isLoading,
+    isError: !!error,
+    error,
+    refetch: mutate,
+  };
+};
+
+export const useUnitFilters = () => {
+  const { data, error, isLoading } = useSWR('/unit-filters', fetchers.getUnitFilters, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: true,
+    dedupingInterval: 300000, // 5 minutes - filters don't change often
+  });
+
+  return {
+    filters: data || { unitTypes: [], tiers: [], factions: [] },
+    isLoading,
+    isError: !!error,
+    error,
+  };
+};
+
+// Game Info hooks
+export const useGameInfo = (filters: GameInfoFilters = {}) => {
+  const filtersKey = JSON.stringify(filters);
+  const { data, error, isLoading, mutate } = useSWR(
+    ['/gameinfo', filtersKey], 
+    () => fetchers.getAllGameInfo(filters), 
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 60000,
+    }
+  );
+
+  return {
+    gameInfo: data || [],
+    isLoading,
+    isError: !!error,
+    error,
+    refetch: mutate,
+  };
+};
+
+export const useGameInfoById = (id: number) => {
+  const { data, error, isLoading, mutate } = useSWR(
+    id ? `/gameinfo/${id}` : null,
+    () => fetchers.getGameInfoById(id),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+    }
+  );
+
+  return {
+    gameInfo: data,
+    isLoading,
+    isError: !!error,
+    error,
+    refetch: mutate,
+  };
+};
+
+export const useGameInfoBySlug = (slug: string) => {
+  const { data, error, isLoading, mutate } = useSWR(
+    slug ? `/gameinfo/slug/${slug}` : null,
+    () => fetchers.getGameInfoBySlug(slug),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+    }
+  );
+
+  return {
+    gameInfo: data,
+    isLoading,
+    isError: !!error,
+    error,
+    refetch: mutate,
+  };
+};
+
+export const useGameInfoCategories = () => {
+  const { data, error, isLoading } = useSWR('/gameinfo-categories', fetchers.getGameInfoCategories, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: true,
+    dedupingInterval: 300000, // 5 minutes
+  });
+
+  return {
+    categories: data || [],
+    isLoading,
+    isError: !!error,
+    error,
+  };
+};
+
+export const useFeaturedGameInfo = (limit = 6) => {
+  const { data, error, isLoading, mutate } = useSWR(
+    ['/featured-gameinfo', limit], 
+    () => fetchers.getFeaturedGameInfo(limit), 
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 120000, // 2 minutes
+    }
+  );
+
+  return {
+    featuredGameInfo: data || [],
+    isLoading,
+    isError: !!error,
+    error,
+    refetch: mutate,
   };
 };
