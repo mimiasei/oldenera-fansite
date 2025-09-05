@@ -101,7 +101,7 @@ builder.Services.AddCors(options =>
             else
             {
                 // Configure for production - update with your actual frontend domain
-                corsBuilder.WithOrigins("https://oldenerafansite-frontend.onrender.com")
+                corsBuilder.WithOrigins("https://oldenwiki.com")
                            .AllowAnyHeader()
                            .AllowAnyMethod();
             }
