@@ -16,6 +16,8 @@ import AdminUsers from './pages/AdminUsers';
 import AdminSettings from './pages/AdminSettings';
 import NewsCreate from './pages/NewsCreate';
 import NewsEdit from './pages/NewsEdit';
+import Factions from './pages/Factions';
+import FactionDetail from './pages/FactionDetail';
 import NotificationContainer from './components/NotificationContainer';
 
 function App() {
@@ -79,13 +81,10 @@ function App() {
                 </ProtectedRoute>
               } />
               
-              {/* Coming Soon Pages */}
-              <Route path="/game-info" element={
-                <div className="container mx-auto px-4 py-8 text-center">
-                  <h1 className="text-4xl font-bold mb-6 font-fantasy">Factions</h1>
-                  <p className="text-lg text-gray-600">Factions page coming soon...</p>
-                </div>
-              } />
+              {/* Game Information Routes */}
+              <Route path="/factions" element={<Factions />} />
+              <Route path="/factions/:id" element={<FactionDetail />} />
+              <Route path="/game-info" element={<Factions />} />
               <Route path="/screenshots" element={
                 <div className="container mx-auto px-4 py-8 text-center">
                   <h1 className="text-4xl font-bold mb-6 font-fantasy">Screenshots</h1>

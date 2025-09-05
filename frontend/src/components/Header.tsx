@@ -37,7 +37,7 @@ const Header = () => {
                 </li>
                 <li>
                   <Link 
-                    to="/game-info" 
+                    to="/factions" 
                     className="hover:text-primary-200 transition-colors duration-200"
                   >
                     Factions
