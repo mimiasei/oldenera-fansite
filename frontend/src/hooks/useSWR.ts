@@ -7,7 +7,9 @@ import {
   unitApi, 
   UnitApiFilters, 
   gameInfoApi, 
-  GameInfoFilters 
+  GameInfoFilters,
+  mediaApi,
+  MediaFiltersParams
 } from '../services/api';
 import { 
   NewsArticle, 
@@ -16,7 +18,10 @@ import {
   GameInfo, 
   Hero, 
   UnitFilters, 
-  GameInfoCategory 
+  GameInfoCategory,
+  MediaItem,
+  MediaCategory,
+  MediaFilters
 } from '../types';
 
 // Fetcher functions for SWR
@@ -96,6 +101,27 @@ const fetchers = {
   
   getFeaturedGameInfo: async (limit = 6): Promise<GameInfo[]> => {
     const response = await gameInfoApi.getFeatured(limit);
+    return response.data;
+  },
+
+  // Media fetchers
+  getMediaCategories: async (activeOnly = true): Promise<MediaCategory[]> => {
+    const response = await mediaApi.getCategories(activeOnly);
+    return response.data;
+  },
+
+  getMediaItems: async (filters: MediaFiltersParams = {}): Promise<MediaItem[]> => {
+    const response = await mediaApi.getMediaItems(filters);
+    return response.data;
+  },
+
+  getMediaItem: async (id: number): Promise<MediaItem> => {
+    const response = await mediaApi.getMediaItem(id);
+    return response.data;
+  },
+
+  getMediaFilters: async (): Promise<MediaFilters> => {
+    const response = await mediaApi.getFilters();
     return response.data;
   },
 };
@@ -397,6 +423,108 @@ export const useFeaturedGameInfo = (limit = 6) => {
 
   return {
     featuredGameInfo: data || [],
+    isLoading,
+    isError: !!error,
+    error,
+    refetch: mutate,
+  };
+};
+
+// Media SWR hooks
+export const useMediaCategories = (activeOnly = true) => {
+  const { data, error, isLoading, mutate } = useSWR(
+    ['/media-categories', activeOnly],
+    () => fetchers.getMediaCategories(activeOnly),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 120000, // 2 minutes - categories don't change often
+    }
+  );
+
+  return {
+    categories: data || [],
+    isLoading,
+    isError: !!error,
+    error,
+    refetch: mutate,
+  };
+};
+
+export const useMediaItems = (filters: MediaFiltersParams = {}) => {
+  const filtersKey = JSON.stringify(filters);
+  const { data, error, isLoading, mutate } = useSWR(
+    ['/media-items', filtersKey],
+    () => fetchers.getMediaItems(filters),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 60000, // 1 minute
+    }
+  );
+
+  return {
+    mediaItems: data || [],
+    isLoading,
+    isError: !!error,
+    error,
+    refetch: mutate,
+  };
+};
+
+export const useMediaItem = (id: number) => {
+  const { data, error, isLoading, mutate } = useSWR(
+    id ? ['/media-item', id] : null,
+    () => fetchers.getMediaItem(id),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 60000,
+    }
+  );
+
+  return {
+    mediaItem: data || null,
+    isLoading,
+    isError: !!error,
+    error,
+    refetch: mutate,
+  };
+};
+
+export const useMediaFilters = () => {
+  const { data, error, isLoading, mutate } = useSWR(
+    '/media-filters',
+    fetchers.getMediaFilters,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 300000, // 5 minutes - filter options change rarely
+    }
+  );
+
+  return {
+    filters: data || { categories: [], mediaTypes: [], factions: [] },
+    isLoading,
+    isError: !!error,
+    error,
+    refetch: mutate,
+  };
+};
+
+export const useFeaturedMedia = (limit = 8) => {
+  const { data, error, isLoading, mutate } = useSWR(
+    ['/featured-media', limit],
+    () => fetchers.getMediaItems({ featuredOnly: true, pageSize: limit }),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 120000, // 2 minutes
+    }
+  );
+
+  return {
+    featuredMedia: data || [],
     isLoading,
     isError: !!error,
     error,

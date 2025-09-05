@@ -186,3 +186,66 @@ export interface GameInfoCategory {
   count: number;
   featuredCount: number;
 }
+
+// Media Gallery interfaces
+export interface MediaCategory {
+  id: number;
+  name: string;
+  description: string;
+  slug: string;
+  iconUrl?: string;
+  thumbnailUrl?: string;
+  color: string;
+  createdAt: string;
+  updatedAt: string;
+  isActive: boolean;
+  sortOrder: number;
+  mediaItems?: MediaItem[];
+}
+
+export interface MediaItem {
+  id: number;
+  title: string;
+  description: string;
+  mediaType: string; // "image", "video", "gif"
+  originalUrl: string;
+  thumbnailUrl?: string;
+  largeUrl?: string;
+  originalFileName?: string;
+  fileSize: number;
+  width?: number;
+  height?: number;
+  tags?: string;
+  altText?: string;
+  caption?: string;
+  categoryId: number;
+  category?: MediaCategory;
+  factionId?: number;
+  faction?: Faction;
+  uploadedByUserId?: string;
+  uploadedByUser?: User;
+  isApproved: boolean;
+  isFeatured: boolean;
+  createdAt: string;
+  updatedAt: string;
+  isActive: boolean;
+  viewCount: number;
+  sortOrder: number;
+}
+
+export interface User {
+  id: string;
+  userName: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+  profilePictureUrl?: string;
+  emailConfirmed: boolean;
+  roles: string[];
+}
+
+export interface MediaFilters {
+  categories: { id: number; name: string; slug: string }[];
+  mediaTypes: string[];
+  factions: { id: number; name: string }[];
+}

@@ -6,7 +6,10 @@ import {
   Hero, 
   GameInfo, 
   UnitFilters, 
-  GameInfoCategory 
+  GameInfoCategory,
+  MediaItem,
+  MediaCategory,
+  MediaFilters
 } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -264,6 +267,68 @@ export const heroApi = {
 // Spell API (basic endpoints for future expansion)
 export const spellApi = {
   // Future implementation for spell management
+};
+
+// Media API
+export interface MediaFiltersParams {
+  categoryId?: number;
+  mediaType?: string;
+  factionId?: number;
+  featuredOnly?: boolean;
+  approvedOnly?: boolean;
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export const mediaApi = {
+  // Media Categories
+  getCategories: (activeOnly = true) => 
+    api.get<MediaCategory[]>(`/media/categories?activeOnly=${activeOnly}`),
+  
+  getCategory: (id: number) => 
+    api.get<MediaCategory>(`/media/categories/${id}`),
+  
+  createCategory: (category: Partial<MediaCategory>) => 
+    api.post<MediaCategory>('/media/categories', category),
+  
+  updateCategory: (id: number, category: Partial<MediaCategory>) => 
+    api.put(`/media/categories/${id}`, category),
+  
+  deleteCategory: (id: number) => 
+    api.delete(`/media/categories/${id}`),
+
+  // Media Items
+  getMediaItems: (filters: MediaFiltersParams = {}) => {
+    const params = new URLSearchParams();
+    
+    if (filters.categoryId) params.append('categoryId', filters.categoryId.toString());
+    if (filters.mediaType) params.append('mediaType', filters.mediaType);
+    if (filters.factionId) params.append('factionId', filters.factionId.toString());
+    if (filters.featuredOnly) params.append('featuredOnly', 'true');
+    if (filters.approvedOnly !== undefined) params.append('approvedOnly', filters.approvedOnly.toString());
+    if (filters.search) params.append('search', filters.search);
+    if (filters.page) params.append('page', filters.page.toString());
+    if (filters.pageSize) params.append('pageSize', filters.pageSize.toString());
+    
+    return api.get<MediaItem[]>(`/media?${params.toString()}`);
+  },
+  
+  getMediaItem: (id: number) => 
+    api.get<MediaItem>(`/media/${id}`),
+  
+  createMediaItem: (item: Partial<MediaItem>) => 
+    api.post<MediaItem>('/media', item),
+  
+  updateMediaItem: (id: number, item: Partial<MediaItem>) => 
+    api.put(`/media/${id}`, item),
+  
+  deleteMediaItem: (id: number) => 
+    api.delete(`/media/${id}`),
+
+  // Media Filters
+  getFilters: () => 
+    api.get<MediaFilters>('/media/filters'),
 };
 
 // SWR fetcher function

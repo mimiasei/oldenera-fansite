@@ -17,6 +17,8 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<FactionSpell> FactionSpells { get; set; }
     public DbSet<Hero> Heroes { get; set; }
     public DbSet<GameInfo> GameInfos { get; set; }
+    public DbSet<MediaCategory> MediaCategories { get; set; }
+    public DbSet<MediaItem> MediaItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -166,6 +168,41 @@ public class ApplicationDbContext : IdentityDbContext<User>
                     v => string.Join(',', v.Select(x => x.ToString())),
                     v => v.Split(',', StringSplitOptions.RemoveEmptyEntries)
                           .Select(x => int.Parse(x)).ToList());
+        });
+
+        // MediaCategory configuration
+        modelBuilder.Entity<MediaCategory>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.Slug).IsUnique();
+            entity.HasIndex(e => e.Name);
+        });
+
+        // MediaItem configuration
+        modelBuilder.Entity<MediaItem>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => new { e.CategoryId, e.CreatedAt });
+            entity.HasIndex(e => e.MediaType);
+            entity.HasIndex(e => e.IsFeatured);
+            
+            entity.HasOne(e => e.Category)
+                .WithMany(c => c.MediaItems)
+                .HasForeignKey(e => e.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
+            entity.HasOne(e => e.Faction)
+                .WithMany()
+                .HasForeignKey(e => e.FactionId)
+                .OnDelete(DeleteBehavior.SetNull);
+                
+            entity.HasOne(e => e.UploadedByUser)
+                .WithMany()
+                .HasForeignKey(e => e.UploadedByUserId)
+                .OnDelete(DeleteBehavior.SetNull);
+                
+            entity.Property(e => e.Tags)
+                .HasConversion(v => v, v => v);
         });
     }
 }

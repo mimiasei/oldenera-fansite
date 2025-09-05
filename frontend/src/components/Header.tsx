@@ -74,6 +74,9 @@ const Header = () => {
                       <Link to="/admin/news" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         Manage News
                       </Link>
+                      <Link to="/admin/media" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        Manage Media
+                      </Link>
                       {user?.roles?.includes('Admin') && (
                         <>
                           <Link to="/admin/users" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
