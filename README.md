@@ -4,6 +4,7 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 
 ## 🏰 Features
 
+- **Complete Faction Overview Pages**: Professional faction listing and detailed pages with unit/hero filtering and comprehensive game content display
 - **Complete Game Information System**: Full infrastructure for factions, units, heroes, and spells with REST API
 - **Complete News Management System**: Full CRUD operations for news articles with advanced search and filtering
 - **Advanced User Authentication System**: JWT-based authentication with role-based access control and comprehensive UX
@@ -12,6 +13,7 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 - **Game Content Database**: PostgreSQL schema with faction data (Haven, Necropolis, Inferno) ready for expansion
 - **Professional API Design**: RESTful architecture with filtering, pagination, and admin-only endpoints
 - **SWR Data Fetching**: Optimal client-side caching with custom hooks for game content management
+- **Interactive Game Content**: Tabbed interfaces with unit/hero filtering, stat displays, and faction information
 - **Type-Safe Development**: Complete TypeScript coverage for all game models and API interactions
 - **Responsive Design**: Built with Tailwind CSS and custom fantasy theme with background imagery
 - **Modern Tech Stack**: ASP.NET Core backend with React TypeScript frontend
@@ -179,7 +181,9 @@ The site features a fantasy-themed design inspired by the Heroes of Might and Ma
 - [x] Complete game information system infrastructure (backend API, database, frontend types)
 - [x] Game content models (Faction, Unit, Hero, Spell) with sample faction data
 - [x] SWR hooks and API services for optimal game content data fetching
-- [ ] Faction overview pages and unit/hero displays (in progress)
+- [x] Faction overview pages with professional listing and detailed faction pages
+- [x] Interactive unit/hero filtering and comprehensive stat displays
+- [x] Tabbed interface for faction overview, units, and heroes sections
 - [ ] Game information admin interface for content management
 - [ ] Comment system for news articles
 - [ ] Image gallery for screenshots

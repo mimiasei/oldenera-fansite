@@ -89,3 +89,4 @@ oldenerafansite/
 - whenever using the classes btn-primary or btn-secondary, always use the class btn first like this: className="btn btn-primary"
 - when I say "update files" then update the todo, changes and root readme files.
 - when I say "do git" then commit and push
+- by "read files" I mean read the claude, changes and todo files

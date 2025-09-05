@@ -30,7 +30,11 @@
 - [x] Create comprehensive database schema with sample faction data
 - [x] Implement backend API controllers with full CRUD operations
 - [x] Create frontend types and SWR hooks for data fetching
-- [ ] Create static game information pages
+- [x] Create Factions listing page with professional card layout
+- [x] Implement individual Faction detail pages with tabbed interface
+- [x] Add filtering for units by tier and type, heroes by class
+- [x] Implement comprehensive faction information display (stats, abilities, etc.)
+- [x] Update navigation routing for faction pages
 - [ ] Implement structured data for game content
 - [ ] Add rich media support (images, videos)
 - [ ] Create game information admin interface
@@ -165,7 +169,7 @@
 
 ## Notes
 
-- **Next Priority**: Faction Overview Pages - Now that game info infrastructure is complete, build user-facing faction pages and components
+- **Next Priority**: Screenshot/Media Gallery - Now that faction pages are complete, build visual media gallery system
 - **Development Approach**: Implement features incrementally, testing thoroughly before moving to next item
 - **Code Quality**: Maintain TypeScript strict mode and proper error handling throughout
 - **Documentation**: Update CHANGES.md after completing each major feature
@@ -180,4 +184,6 @@
 
 **Game Information System Infrastructure Complete**: Complete backend and frontend infrastructure for game content management. Database schema with faction, unit, spell, and hero models. Full REST API with filtering and admin controls. Frontend types and SWR hooks ready for building game content pages.
 
-**Next Phase**: Faction Overview Pages - Build user-facing faction pages showcasing game content with units, heroes, and faction details. This will be the core content that fans visit the site for.
+**Faction Overview Pages Complete**: Professional faction pages with comprehensive game content display, filtering, and navigation. Fans can now explore factions, units, and heroes through an intuitive interface.
+
+**Next Phase**: Screenshot/Media Gallery - Build a media gallery system for game screenshots, videos, and other visual content to complement the faction information system.
