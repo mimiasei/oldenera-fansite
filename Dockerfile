@@ -1,9 +1,10 @@
 ﻿# build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /backend
-COPY . .
-RUN dotnet restore
-RUN dotnet publish -c Release -o /app
+WORKDIR /src
+COPY backend/*.csproj ./backend/
+RUN dotnet restore ./backend
+COPY backend/. ./backend
+RUN dotnet publish ./backend -c Release -o /app
 
 # run
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
