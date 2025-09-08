@@ -17,6 +17,14 @@ builder.Services.AddSwaggerGen();
 // Add Entity Framework and PostgreSQL
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
     ?? Environment.GetEnvironmentVariable("DATABASE_URL");
+
+Console.WriteLine($"Database connection configured: {!string.IsNullOrEmpty(connectionString)}");
+
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("Database connection string not configured. Check DATABASE_URL environment variable.");
+}
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
@@ -48,27 +56,16 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 
 // Add JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JWT");
-var rawSecretKey = jwtSettings["SecretKey"] ?? Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
-
-Console.WriteLine($"Raw secret key length: {rawSecretKey?.Length ?? 0}");
-Console.WriteLine($"Raw secret key preview: '{rawSecretKey?.Substring(0, Math.Min(20, rawSecretKey?.Length ?? 0))}...'");
-
-if (string.IsNullOrEmpty(rawSecretKey))
-{
-    throw new InvalidOperationException("JWT SecretKey not configured - check environment variables");
-}
+var secretKeyString = jwtSettings["SecretKey"] 
+    ?? Environment.GetEnvironmentVariable("JWT_SECRET_KEY") 
+    ?? throw new InvalidOperationException("JWT SecretKey not configured");
 
 // Clean any potential whitespace from the key
-var secretKeyString = rawSecretKey.Replace("\n", "").Replace("\r", "").Replace(" ", "").Replace("\t", "").Trim();
-
-Console.WriteLine($"Cleaned secret key length: {secretKeyString.Length}");
-Console.WriteLine($"First 10 chars after cleaning: '{secretKeyString.Substring(0, Math.Min(10, secretKeyString.Length))}'");
+secretKeyString = secretKeyString.Replace("\n", "").Replace("\r", "").Replace(" ", "").Replace("\t", "").Trim();
 
 if (secretKeyString.Length < 32)
 {
-    Console.WriteLine($"ERROR: Secret key too short ({secretKeyString.Length} chars)");
-    Console.WriteLine("Please check your JWT_SECRET_KEY environment variable in Render");
-    throw new InvalidOperationException($"JWT SecretKey too short after cleaning: {secretKeyString.Length} characters (need at least 32)");
+    throw new InvalidOperationException($"JWT SecretKey too short: {secretKeyString.Length} characters");
 }
 
 var secretKey = Encoding.UTF8.GetBytes(secretKeyString);
@@ -129,6 +126,20 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Test database connection on startup
+try
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await context.Database.CanConnectAsync();
+    Console.WriteLine("Database connection successful");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Database connection failed: {ex.Message}");
+    throw new InvalidOperationException($"Cannot connect to database: {ex.Message}", ex);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
