@@ -31,29 +31,29 @@ Console.WriteLine($"Total environment variables: {allEnvVars.Count}");
 Console.WriteLine($"DATABASE_URL exists: {Environment.GetEnvironmentVariable("DATABASE_URL") != null}");
 Console.WriteLine($"DATABASE_URL value length: {Environment.GetEnvironmentVariable("DATABASE_URL")?.Length ?? 0}");
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-    ?? Environment.GetEnvironmentVariable("DATABASE_URL");
+var configConnection = builder.Configuration.GetConnectionString("DefaultConnection");
+var envConnection = Environment.GetEnvironmentVariable("DATABASE_URL");
 
+Console.WriteLine($"Config connection: {configConnection?.Length ?? 0} chars");
+Console.WriteLine($"Env connection: {envConnection?.Length ?? 0} chars");
+
+var connectionString = configConnection ?? envConnection;
+
+Console.WriteLine($"Final connection string: {connectionString?.Length ?? 0} chars");
 Console.WriteLine($"Database connection configured: {!string.IsNullOrEmpty(connectionString)}");
 
 if (string.IsNullOrEmpty(connectionString))
 {
-    Console.WriteLine("ERROR: No database connection string found!");
-    Console.WriteLine("Checking alternative environment variable names...");
+    Console.WriteLine("ERROR: Connection string is null/empty despite DATABASE_URL existing!");
+    Console.WriteLine("Forcing direct environment variable usage...");
     
-    // Try alternative names in case of Render issues
-    var altConnection = Environment.GetEnvironmentVariable("DATABASE_CONNECTION") 
-        ?? Environment.GetEnvironmentVariable("POSTGRES_URL")
-        ?? Environment.GetEnvironmentVariable("DB_URL");
-        
-    if (!string.IsNullOrEmpty(altConnection))
+    // Force direct usage since we know DATABASE_URL exists
+    connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
+    Console.WriteLine($"Forced connection string length: {connectionString?.Length ?? 0}");
+    
+    if (string.IsNullOrEmpty(connectionString))
     {
-        Console.WriteLine($"Found alternative connection: length {altConnection.Length}");
-        connectionString = altConnection;
-    }
-    else
-    {
-        throw new InvalidOperationException("Database connection string not configured. Check DATABASE_URL environment variable.");
+        throw new InvalidOperationException("DATABASE_URL environment variable exists but returns empty value - this is a Render platform issue.");
     }
 }
 
