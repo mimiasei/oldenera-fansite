@@ -32,7 +32,9 @@ Console.WriteLine($"DATABASE_URL exists: {Environment.GetEnvironmentVariable("DA
 Console.WriteLine($"DATABASE_URL value length: {Environment.GetEnvironmentVariable("DATABASE_URL")?.Length ?? 0}");
 
 var configConnection = builder.Configuration.GetConnectionString("DefaultConnection");
-var envConnection = Environment.GetEnvironmentVariable("DATABASE_URL");
+var envConnection = Environment.GetEnvironmentVariable("DATABASE_URL")
+    ?? Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
+    ?? Environment.GetEnvironmentVariable("POSTGRES_CONNECTION");
 
 Console.WriteLine($"Config connection: {configConnection?.Length ?? 0} chars");
 Console.WriteLine($"Env connection: {envConnection?.Length ?? 0} chars");
