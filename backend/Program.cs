@@ -6,66 +6,39 @@ using OldenEraFanSite.Api.Data;
 using OldenEraFanSite.Api.Models;
 using OldenEraFanSite.Api.Services;
 using System.Text;
+using DotNetEnv;
 
 Console.WriteLine("=== Starting OldenEra API ===");
+
+// Load .env file if it exists (for local development)
+if (File.Exists(".env"))
+{
+    Env.Load();
+    Console.WriteLine("✓ .env file loaded");
+}
+
 Console.WriteLine($"Environment: {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}");
 
 var builder = WebApplication.CreateBuilder(args);
-Console.WriteLine("✓ WebApplication.CreateBuilder completed");
 
 // Add services to the container.
-Console.WriteLine("Adding basic services...");
 builder.Services.AddControllers();
-Console.WriteLine("✓ AddControllers completed");
 builder.Services.AddEndpointsApiExplorer();
-Console.WriteLine("✓ AddEndpointsApiExplorer completed");
 builder.Services.AddSwaggerGen();
-Console.WriteLine("✓ AddSwaggerGen completed");
 
 // Add Entity Framework and PostgreSQL  
-Console.WriteLine("Configuring database...");
-
-// Debug environment variables
-var allEnvVars = Environment.GetEnvironmentVariables();
-Console.WriteLine($"Total environment variables: {allEnvVars.Count}");
-Console.WriteLine($"DATABASE_URL exists: {Environment.GetEnvironmentVariable("DATABASE_URL") != null}");
-Console.WriteLine($"DATABASE_URL value length: {Environment.GetEnvironmentVariable("DATABASE_URL")?.Length ?? 0}");
-
-var configConnection = builder.Configuration.GetConnectionString("DefaultConnection");
-var envConnection = Environment.GetEnvironmentVariable("DATABASE_URL")
-    ?? Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
-    ?? Environment.GetEnvironmentVariable("POSTGRES_CONNECTION");
-
-Console.WriteLine($"Config connection: {configConnection?.Length ?? 0} chars");
-Console.WriteLine($"Env connection: {envConnection?.Length ?? 0} chars");
-
-var connectionString = configConnection ?? envConnection;
-
-Console.WriteLine($"Final connection string: {connectionString?.Length ?? 0} chars");
-Console.WriteLine($"Database connection configured: {!string.IsNullOrEmpty(connectionString)}");
+var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") 
+    ?? builder.Configuration.GetConnectionString("DefaultConnection");
 
 if (string.IsNullOrEmpty(connectionString))
 {
-    Console.WriteLine("ERROR: Connection string is null/empty despite DATABASE_URL existing!");
-    Console.WriteLine("Forcing direct environment variable usage...");
-    
-    // Force direct usage since we know DATABASE_URL exists
-    connectionString = Environment.GetEnvironmentVariable("DATABASE_URL");
-    Console.WriteLine($"Forced connection string length: {connectionString?.Length ?? 0}");
-    
-    if (string.IsNullOrEmpty(connectionString))
-    {
-        throw new InvalidOperationException("DATABASE_URL environment variable exists but returns empty value - this is a Render platform issue.");
-    }
+    throw new InvalidOperationException("Database connection string not found. Please set DATABASE_URL environment variable or DefaultConnection in appsettings.json");
 }
 
-Console.WriteLine("Adding DbContext...");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
-Console.WriteLine("✓ DbContext added");
 
 // Add Identity
-Console.WriteLine("Adding Identity services...");
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     // Password settings
@@ -90,24 +63,29 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
-Console.WriteLine("✓ Identity services added");
 
 // Add JWT Authentication
-Console.WriteLine("Configuring JWT...");
-var jwtSettings = builder.Configuration.GetSection("JWT");
-var secretKeyString = jwtSettings["SecretKey"] 
-    ?? Environment.GetEnvironmentVariable("JWT_SECRET_KEY") 
-    ?? throw new InvalidOperationException("JWT SecretKey not configured");
+var jwtSecretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY") 
+    ?? builder.Configuration["JWT:SecretKey"] 
+    ?? throw new InvalidOperationException("JWT_SECRET_KEY environment variable not configured");
+
+var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") 
+    ?? builder.Configuration["JWT:Issuer"] 
+    ?? throw new InvalidOperationException("JWT_ISSUER environment variable not configured");
+
+var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") 
+    ?? builder.Configuration["JWT:Audience"] 
+    ?? throw new InvalidOperationException("JWT_AUDIENCE environment variable not configured");
 
 // Clean any potential whitespace from the key
-secretKeyString = secretKeyString.Replace("\n", "").Replace("\r", "").Replace(" ", "").Replace("\t", "").Trim();
+jwtSecretKey = jwtSecretKey.Replace("\n", "").Replace("\r", "").Replace(" ", "").Replace("\t", "").Trim();
 
-if (secretKeyString.Length < 32)
+if (jwtSecretKey.Length < 32)
 {
-    throw new InvalidOperationException($"JWT SecretKey too short: {secretKeyString.Length} characters");
+    throw new InvalidOperationException($"JWT SecretKey too short: {jwtSecretKey.Length} characters");
 }
 
-var secretKey = Encoding.UTF8.GetBytes(secretKeyString);
+var secretKey = Encoding.UTF8.GetBytes(jwtSecretKey);
 
 builder.Services.AddAuthentication(options =>
 {
@@ -124,9 +102,9 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(secretKey),
         ValidateIssuer = true,
-        ValidIssuer = jwtSettings["Issuer"],
+        ValidIssuer = jwtIssuer,
         ValidateAudience = true,
-        ValidAudience = jwtSettings["Audience"],
+        ValidAudience = jwtAudience,
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero
     };
@@ -166,18 +144,17 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Test database connection on startup (non-blocking for Render deployment)
+// Test database connection on startup
 try
 {
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await context.Database.CanConnectAsync();
-    Console.WriteLine("Database connection successful");
+    Console.WriteLine("✓ Database connection successful");
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"Database connection test failed: {ex.Message}");
-    Console.WriteLine("Continuing startup - database will be tested on first request");
+    Console.WriteLine($"⚠ Database connection failed: {ex.Message}");
 }
 
 // Configure the HTTP request pipeline.
