@@ -169,17 +169,23 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Test database connection on startup
+// Run database migrations and test connection
 try
 {
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    
+    Console.WriteLine("Running database migrations...");
+    await context.Database.MigrateAsync();
+    Console.WriteLine("✓ Database migrations completed");
+    
     await context.Database.CanConnectAsync();
     Console.WriteLine("✓ Database connection successful");
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"⚠ Database connection failed: {ex.Message}");
+    Console.WriteLine($"⚠ Database setup failed: {ex.Message}");
+    throw; // Re-throw to prevent startup with broken database
 }
 
 // Configure the HTTP request pipeline.
