@@ -48,16 +48,27 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 
 // Add JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JWT");
-var secretKeyString = jwtSettings["SecretKey"] 
-    ?? Environment.GetEnvironmentVariable("JWT_SECRET_KEY") 
-    ?? throw new InvalidOperationException("JWT SecretKey not configured");
+var rawSecretKey = jwtSettings["SecretKey"] ?? Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+
+Console.WriteLine($"Raw secret key length: {rawSecretKey?.Length ?? 0}");
+Console.WriteLine($"Raw secret key preview: '{rawSecretKey?.Substring(0, Math.Min(20, rawSecretKey?.Length ?? 0))}...'");
+
+if (string.IsNullOrEmpty(rawSecretKey))
+{
+    throw new InvalidOperationException("JWT SecretKey not configured - check environment variables");
+}
 
 // Clean any potential whitespace from the key
-secretKeyString = secretKeyString.Replace("\n", "").Replace("\r", "").Replace(" ", "").Replace("\t", "").Trim();
+var secretKeyString = rawSecretKey.Replace("\n", "").Replace("\r", "").Replace(" ", "").Replace("\t", "").Trim();
 
-if (string.IsNullOrEmpty(secretKeyString) || secretKeyString.Length < 32)
+Console.WriteLine($"Cleaned secret key length: {secretKeyString.Length}");
+Console.WriteLine($"First 10 chars after cleaning: '{secretKeyString.Substring(0, Math.Min(10, secretKeyString.Length))}'");
+
+if (secretKeyString.Length < 32)
 {
-    throw new InvalidOperationException("JWT SecretKey is invalid or too short");
+    Console.WriteLine($"ERROR: Secret key too short ({secretKeyString.Length} chars)");
+    Console.WriteLine("Please check your JWT_SECRET_KEY environment variable in Render");
+    throw new InvalidOperationException($"JWT SecretKey too short after cleaning: {secretKeyString.Length} characters (need at least 32)");
 }
 
 var secretKey = Encoding.UTF8.GetBytes(secretKeyString);
