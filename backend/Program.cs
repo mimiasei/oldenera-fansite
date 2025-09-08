@@ -7,14 +7,23 @@ using OldenEraFanSite.Api.Models;
 using OldenEraFanSite.Api.Services;
 using System.Text;
 
+Console.WriteLine("=== Starting OldenEra API ===");
+Console.WriteLine($"Environment: {Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}");
+
 var builder = WebApplication.CreateBuilder(args);
+Console.WriteLine("✓ WebApplication.CreateBuilder completed");
 
 // Add services to the container.
+Console.WriteLine("Adding basic services...");
 builder.Services.AddControllers();
+Console.WriteLine("✓ AddControllers completed");
 builder.Services.AddEndpointsApiExplorer();
+Console.WriteLine("✓ AddEndpointsApiExplorer completed");
 builder.Services.AddSwaggerGen();
+Console.WriteLine("✓ AddSwaggerGen completed");
 
-// Add Entity Framework and PostgreSQL
+// Add Entity Framework and PostgreSQL  
+Console.WriteLine("Configuring database...");
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
     ?? Environment.GetEnvironmentVariable("DATABASE_URL");
 
@@ -25,10 +34,13 @@ if (string.IsNullOrEmpty(connectionString))
     throw new InvalidOperationException("Database connection string not configured. Check DATABASE_URL environment variable.");
 }
 
+Console.WriteLine("Adding DbContext...");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
+Console.WriteLine("✓ DbContext added");
 
 // Add Identity
+Console.WriteLine("Adding Identity services...");
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
     // Password settings
@@ -53,8 +65,10 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 })
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
+Console.WriteLine("✓ Identity services added");
 
 // Add JWT Authentication
+Console.WriteLine("Configuring JWT...");
 var jwtSettings = builder.Configuration.GetSection("JWT");
 var secretKeyString = jwtSettings["SecretKey"] 
     ?? Environment.GetEnvironmentVariable("JWT_SECRET_KEY") 
@@ -127,7 +141,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Test database connection on startup
+// Test database connection on startup (non-blocking for Render deployment)
 try
 {
     using var scope = app.Services.CreateScope();
@@ -137,8 +151,8 @@ try
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"Database connection failed: {ex.Message}");
-    throw new InvalidOperationException($"Cannot connect to database: {ex.Message}", ex);
+    Console.WriteLine($"Database connection test failed: {ex.Message}");
+    Console.WriteLine("Continuing startup - database will be tested on first request");
 }
 
 // Configure the HTTP request pipeline.
