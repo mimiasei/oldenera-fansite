@@ -24,6 +24,13 @@ Console.WriteLine("✓ AddSwaggerGen completed");
 
 // Add Entity Framework and PostgreSQL  
 Console.WriteLine("Configuring database...");
+
+// Debug environment variables
+var allEnvVars = Environment.GetEnvironmentVariables();
+Console.WriteLine($"Total environment variables: {allEnvVars.Count}");
+Console.WriteLine($"DATABASE_URL exists: {Environment.GetEnvironmentVariable("DATABASE_URL") != null}");
+Console.WriteLine($"DATABASE_URL value length: {Environment.GetEnvironmentVariable("DATABASE_URL")?.Length ?? 0}");
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
     ?? Environment.GetEnvironmentVariable("DATABASE_URL");
 
@@ -31,7 +38,23 @@ Console.WriteLine($"Database connection configured: {!string.IsNullOrEmpty(conne
 
 if (string.IsNullOrEmpty(connectionString))
 {
-    throw new InvalidOperationException("Database connection string not configured. Check DATABASE_URL environment variable.");
+    Console.WriteLine("ERROR: No database connection string found!");
+    Console.WriteLine("Checking alternative environment variable names...");
+    
+    // Try alternative names in case of Render issues
+    var altConnection = Environment.GetEnvironmentVariable("DATABASE_CONNECTION") 
+        ?? Environment.GetEnvironmentVariable("POSTGRES_URL")
+        ?? Environment.GetEnvironmentVariable("DB_URL");
+        
+    if (!string.IsNullOrEmpty(altConnection))
+    {
+        Console.WriteLine($"Found alternative connection: length {altConnection.Length}");
+        connectionString = altConnection;
+    }
+    else
+    {
+        throw new InvalidOperationException("Database connection string not configured. Check DATABASE_URL environment variable.");
+    }
 }
 
 Console.WriteLine("Adding DbContext...");
