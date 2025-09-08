@@ -55,13 +55,22 @@ var envSecretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
 Console.WriteLine($"Config SecretKey length: {configSecretKey?.Length ?? 0}");
 Console.WriteLine($"Env JWT_SECRET_KEY length: {envSecretKey?.Length ?? 0}");
 
-var secretKeyString = configSecretKey 
+var rawSecretKey = configSecretKey 
     ?? envSecretKey 
     ?? "h8F2kL9mN3pQ6rS7tU8vW9xY0zA1bC2dE3fG4hI5jK6lM7nO8pQ9rS0tU1vW2xY3zA4b"; // Temporary fallback
 
-if (string.IsNullOrWhiteSpace(secretKeyString))
+Console.WriteLine($"Raw secret key: '{rawSecretKey}' (length: {rawSecretKey?.Length ?? 0})");
+
+// Remove all whitespace (spaces, newlines, tabs)
+var secretKeyString = rawSecretKey?.Replace("\n", "").Replace("\r", "").Replace(" ", "").Replace("\t", "").Trim();
+
+Console.WriteLine($"Final secret key after cleaning: '{secretKeyString}' (length: {secretKeyString?.Length ?? 0})");
+Console.WriteLine($"Is null or whitespace check: {string.IsNullOrWhiteSpace(secretKeyString)}");
+
+if (string.IsNullOrEmpty(secretKeyString) || secretKeyString.Length < 32)
 {
-    throw new InvalidOperationException("JWT SecretKey is empty or whitespace");
+    Console.WriteLine("ERROR: Secret key is null, empty, or too short");
+    throw new InvalidOperationException($"JWT SecretKey is invalid. Length: {secretKeyString?.Length ?? 0}");
 }
 
 var secretKey = Encoding.UTF8.GetBytes(secretKeyString);
