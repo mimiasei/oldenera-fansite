@@ -48,40 +48,16 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 
 // Add JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JWT");
+var secretKeyString = jwtSettings["SecretKey"] 
+    ?? Environment.GetEnvironmentVariable("JWT_SECRET_KEY") 
+    ?? throw new InvalidOperationException("JWT SecretKey not configured");
 
-// Debug logging for JWT configuration
-var configSecretKey = jwtSettings["SecretKey"];
-var envSecretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
-Console.WriteLine($"Config SecretKey length: {configSecretKey?.Length ?? 0}");
-Console.WriteLine($"Env JWT_SECRET_KEY length: {envSecretKey?.Length ?? 0}");
-
-// Debug: Show raw environment variable with character codes
-if (envSecretKey != null)
-{
-    Console.WriteLine($"Env key first 20 chars as bytes: {string.Join(",", envSecretKey.Take(20).Select(c => (int)c))}");
-}
-
-var secretKeyString = configSecretKey;
-if (string.IsNullOrWhiteSpace(secretKeyString))
-{
-    secretKeyString = envSecretKey;
-    Console.WriteLine($"Using environment variable: '{secretKeyString?.Substring(0, Math.Min(10, secretKeyString?.Length ?? 0))}...' (length: {secretKeyString?.Length ?? 0})");
-}
-if (string.IsNullOrWhiteSpace(secretKeyString))
-{
-    Console.WriteLine("Using fallback secret key");
-    secretKeyString = "h8F2kL9mN3pQ6rS7tU8vW9xY0zA1bC2dE3fG4hI5jK6lM7nO8pQ9rS0tU1vW2xY3zA4b";
-}
-
-// Clean the key
-secretKeyString = secretKeyString?.Replace("\n", "").Replace("\r", "").Replace(" ", "").Replace("\t", "").Trim();
-
-Console.WriteLine($"Final cleaned key length: {secretKeyString?.Length ?? 0}");
+// Clean any potential whitespace from the key
+secretKeyString = secretKeyString.Replace("\n", "").Replace("\r", "").Replace(" ", "").Replace("\t", "").Trim();
 
 if (string.IsNullOrEmpty(secretKeyString) || secretKeyString.Length < 32)
 {
-    Console.WriteLine("ERROR: Secret key is still invalid after processing");
-    throw new InvalidOperationException($"JWT SecretKey is invalid. Length: {secretKeyString?.Length ?? 0}");
+    throw new InvalidOperationException("JWT SecretKey is invalid or too short");
 }
 
 var secretKey = Encoding.UTF8.GetBytes(secretKeyString);
@@ -149,14 +125,42 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else
+{
+    // Enable Swagger in production for testing
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "OldenEra API V1");
+        c.RoutePrefix = "swagger";
+    });
+}
 
-app.UseHttpsRedirection();
+// Skip HTTPS redirection in production (Render handles this)
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.UseCors("AllowReactApp");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Add root endpoint for health check
+app.MapGet("/", () => new { 
+    status = "OK", 
+    message = "OldenEra Fan Site API is running", 
+    timestamp = DateTime.UtcNow,
+    endpoints = new[] { "/api/news", "/api/media/categories", "/swagger" }
+});
+
+// Add health check endpoint
+app.MapGet("/health", () => new { 
+    status = "Healthy", 
+    timestamp = DateTime.UtcNow 
+});
 
 app.Run();
 
