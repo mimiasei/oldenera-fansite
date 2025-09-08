@@ -48,10 +48,23 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 
 // Add JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JWT");
-var secretKey = Encoding.UTF8.GetBytes(
-    jwtSettings["SecretKey"] 
-    ?? Environment.GetEnvironmentVariable("JWT_SECRET_KEY") 
-    ?? throw new InvalidOperationException("JWT SecretKey not configured"));
+
+// Debug logging for JWT configuration
+var configSecretKey = jwtSettings["SecretKey"];
+var envSecretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+Console.WriteLine($"Config SecretKey length: {configSecretKey?.Length ?? 0}");
+Console.WriteLine($"Env JWT_SECRET_KEY length: {envSecretKey?.Length ?? 0}");
+
+var secretKeyString = configSecretKey 
+    ?? envSecretKey 
+    ?? "h8F2kL9mN3pQ6rS7tU8vW9xY0zA1bC2dE3fG4hI5jK6lM7nO8pQ9rS0tU1vW2xY3zA4b"; // Temporary fallback
+
+if (string.IsNullOrWhiteSpace(secretKeyString))
+{
+    throw new InvalidOperationException("JWT SecretKey is empty or whitespace");
+}
+
+var secretKey = Encoding.UTF8.GetBytes(secretKeyString);
 
 builder.Services.AddAuthentication(options =>
 {
