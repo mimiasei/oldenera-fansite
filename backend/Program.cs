@@ -27,8 +27,33 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Add Entity Framework and PostgreSQL  
-var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL") 
-    ?? builder.Configuration.GetConnectionString("DefaultConnection");
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Parse Render.com DATABASE_URL format if provided
+if (!string.IsNullOrEmpty(databaseUrl))
+{
+    try
+    {
+        // Render provides: postgresql://user:password@host:port/database
+        var uri = new Uri(databaseUrl);
+        var host = uri.Host;
+        var port = uri.Port;
+        var database = uri.AbsolutePath.TrimStart('/');
+        var userInfo = uri.UserInfo.Split(':');
+        var username = userInfo[0];
+        var password = userInfo.Length > 1 ? userInfo[1] : "";
+
+        connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+        Console.WriteLine($"✓ Parsed DATABASE_URL for PostgreSQL connection");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"⚠ Failed to parse DATABASE_URL: {ex.Message}");
+        Console.WriteLine($"Using DATABASE_URL directly: {databaseUrl}");
+        connectionString = databaseUrl;
+    }
+}
 
 if (string.IsNullOrEmpty(connectionString))
 {
