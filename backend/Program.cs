@@ -97,15 +97,15 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 // Add JWT Authentication
 var jwtSecretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY") 
     ?? builder.Configuration["JWT:SecretKey"] 
-    ?? throw new InvalidOperationException("JWT_SECRET_KEY environment variable not configured");
+    ?? throw new InvalidOperationException("JWT_SECRET_KEY not found in environment variables or configuration");
 
 var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER") 
     ?? builder.Configuration["JWT:Issuer"] 
-    ?? throw new InvalidOperationException("JWT_ISSUER environment variable not configured");
+    ?? throw new InvalidOperationException("JWT_ISSUER not found in environment variables or configuration");
 
 var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") 
     ?? builder.Configuration["JWT:Audience"] 
-    ?? throw new InvalidOperationException("JWT_AUDIENCE environment variable not configured");
+    ?? throw new InvalidOperationException("JWT_AUDIENCE not found in environment variables or configuration");
 
 // Clean any potential whitespace from the key
 jwtSecretKey = jwtSecretKey.Replace("\n", "").Replace("\r", "").Replace(" ", "").Replace("\t", "").Trim();
@@ -203,6 +203,23 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    
+    // Enable detailed request logging in development
+    app.Use(async (context, next) =>
+    {
+        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+        logger.LogInformation("🌐 {Method} {Path} from {RemoteIp}", 
+            context.Request.Method, 
+            context.Request.Path, 
+            context.Connection.RemoteIpAddress);
+        
+        await next();
+        
+        logger.LogInformation("✅ {Method} {Path} → {StatusCode}", 
+            context.Request.Method, 
+            context.Request.Path, 
+            context.Response.StatusCode);
+    });
 }
 else
 {

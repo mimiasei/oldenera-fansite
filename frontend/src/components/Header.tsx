@@ -9,7 +9,7 @@ const Header = () => {
   return (
     <header className="fantasy-gradient-unfrozen text-white shadow-lg">
       <div className="container mx-auto px-4 py-2">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-2">
           <Link to="/" className="font-bold font-fantasy">
               <div className="text-3xl">Olden Wiki</div>
               <div className="text-xs ml-4">A Heroes of Might and Magic: Olden Era Fan Site</div>
@@ -17,7 +17,7 @@ const Header = () => {
           
           <div className="flex items-center space-x-6">
             {/* Main Navigation */}
-            <nav classname="font-fantasy">
+            <nav className="font-fantasy">
               <ul className="flex space-x-6">
                 <li>
                   <Link 

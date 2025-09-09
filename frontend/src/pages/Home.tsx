@@ -7,7 +7,7 @@ const Home = () => {
   return (
     <div className="space-y-12 bg-fill bg-center bg-no-repeat"         
          style={{
-        backgroundImage: `linear-gradient(rgba(41, 32, 32, 0.85), rgba(69, 52, 52, 0.75)), url('/images/logos/OE_wallpapper.webp')`
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.7)), url('/images/logos/OE_wallpapper.webp')`
     }}>
       {/* Hero Section */}
       <section 
@@ -22,7 +22,7 @@ const Home = () => {
             updates, and community discussion. Stay informed about the return of the 
             legendary strategy series.
           </p>
-          <Link to="/news" className="btn btn-secondary fantasy-gradient-dark">
+          <Link to="/news" className="btn btn-secondary">
             Latest News
           </Link>
         </div>
@@ -93,7 +93,7 @@ const Home = () => {
             enhanced mechanics and new content, it promises to deliver the authentic 
             Heroes experience for a new generation.
           </p>
-          <Link to="/game-info" className="btn btn-secondary fantasy-gradient-dark">
+          <Link to="/game-info" className="btn btn-secondary">
             Learn More About the Game
           </Link>
         </div>

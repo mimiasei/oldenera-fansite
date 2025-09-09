@@ -19,11 +19,11 @@
   }
     
   .btn-primary {
-    @apply bg-primary-600;
+    @apply bg-primary-700;
   }
   
   .btn-secondary {
-    @apply bg-secondary-600;
+    @apply bg-secondary-700;
   }
   
   .card {

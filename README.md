@@ -4,6 +4,9 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 
 ## 🏰 Features
 
+- **Production-Ready Deployment**: Fully deployed to Render.com with automatic database migrations and environment detection
+- **Smart Environment Configuration**: Automatic API endpoint detection (local dev ↔ production) without manual changes
+- **Secure Secret Management**: Complete .env file system with proper Git exclusion and production environment variables
 - **Complete Screenshot/Media Gallery**: Professional media gallery with category filtering, lightbox functionality, and admin management
 - **Complete Faction Overview Pages**: Professional faction listing and detailed pages with unit/hero filtering and comprehensive game content display
 - **Complete Game Information System**: Full infrastructure for factions, units, heroes, and spells with REST API
@@ -22,6 +25,7 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 - **Modern Tech Stack**: ASP.NET Core backend with React TypeScript frontend
 - **PostgreSQL Database**: Robust data storage with Entity Framework Core and ASP.NET Core Identity
 - **Security**: Production-ready authentication with password requirements and account lockout protection
+- **Enhanced Development Logging**: Detailed HTTP request tracking, SQL queries, and authentication debugging
 - **Community Features**: User comments and forum discussions (planned)
 
 ## 🛠 Technology Stack
