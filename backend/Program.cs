@@ -30,12 +30,12 @@ builder.Services.AddSwaggerGen();
 var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-// Parse Render.com DATABASE_URL format if provided
+// Parse DATABASE_URL format if provided
 if (!string.IsNullOrEmpty(databaseUrl))
 {
     try
     {
-        // Render provides: postgresql://user:password@host:port/database
+        // Parse: postgresql://user:password@host:port/database
         var uri = new Uri(databaseUrl);
         var host = uri.Host;
         var port = uri.Port;
@@ -44,8 +44,13 @@ if (!string.IsNullOrEmpty(databaseUrl))
         var username = userInfo[0];
         var password = userInfo.Length > 1 ? userInfo[1] : "";
 
-        connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true";
-        Console.WriteLine($"✓ Parsed DATABASE_URL for PostgreSQL connection");
+        // Use SSL for production (cloud), disable for local development
+        var isLocal = host == "localhost" || host == "127.0.0.1";
+        var sslMode = isLocal ? "Disable" : "Require";
+        var trustCert = isLocal ? "" : ";Trust Server Certificate=true";
+
+        connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode={sslMode}{trustCert}";
+        Console.WriteLine($"✓ Parsed DATABASE_URL for PostgreSQL connection (SSL: {sslMode})");
     }
     catch (Exception ex)
     {
@@ -153,14 +158,19 @@ builder.Services.AddCors(options =>
         {
             if (builder.Environment.IsDevelopment())
             {
+                // Local development - allow all local origins
                 corsBuilder.WithOrigins("http://localhost:5173", "http://localhost:3000")
                            .AllowAnyHeader()
                            .AllowAnyMethod();
             }
             else
             {
-                // Configure for production - update with your actual frontend domain
-                corsBuilder.WithOrigins("https://oldenwiki.com")
+                // Production - allow both production domain AND development origins for testing
+                corsBuilder.WithOrigins(
+                               "https://oldenwiki.com",           // Production frontend
+                               "http://localhost:5173",          // Local dev testing against prod API
+                               "http://localhost:3000"           // Alternative local dev port
+                           )
                            .AllowAnyHeader()
                            .AllowAnyMethod();
             }

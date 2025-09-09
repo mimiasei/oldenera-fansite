@@ -33,6 +33,15 @@
   .fantasy-gradient {
     @apply bg-gradient-to-r from-amber-400 to-purple-800;
   }
+    
+  .fantasy-gradient-unfrozen {
+      background: linear-gradient(
+              90deg,
+              rgba(69, 52, 52, 1) 0%,
+              rgba(172, 169, 90, 1) 75%,
+              rgba(239, 214, 189, 1) 100%
+      );
+  }
 
   .fantasy-gradient-dark {
     @apply bg-gradient-to-r from-amber-600 to-purple-900;

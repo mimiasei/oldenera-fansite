@@ -7,7 +7,7 @@ const Header = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   return (
-    <header className="fantasy-gradient text-white shadow-lg">
+    <header className="fantasy-gradient-unfrozen text-white shadow-lg">
       <div className="container mx-auto px-4 py-2">
         <div className="flex items-center justify-between mb-6">
           <Link to="/" className="font-bold font-fantasy">
@@ -17,7 +17,7 @@ const Header = () => {
           
           <div className="flex items-center space-x-6">
             {/* Main Navigation */}
-            <nav>
+            <nav classname="font-fantasy">
               <ul className="flex space-x-6">
                 <li>
                   <Link 

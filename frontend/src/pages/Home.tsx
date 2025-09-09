@@ -5,13 +5,13 @@ const Home = () => {
   const { latestNews, isLoading, isError } = useLatestNews();
 
   return (
-    <div className="space-y-12 bg-cover bg-center bg-no-repeat"         
+    <div className="space-y-12 bg-fill bg-center bg-no-repeat"         
          style={{
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url('/images/logos/OE_wallpapper.webp')`
+        backgroundImage: `linear-gradient(rgba(41, 32, 32, 0.85), rgba(69, 52, 52, 0.75)), url('/images/logos/OE_wallpapper.webp')`
     }}>
       {/* Hero Section */}
       <section 
-        className="text-white py-20 -mt-6 relative"
+        className="text-white py-20 relative"
       >
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-5xl font-bold mb-6 font-fantasy">

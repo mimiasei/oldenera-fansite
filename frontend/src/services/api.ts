@@ -12,7 +12,29 @@ import {
   MediaFilters
 } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Smart environment detection
+const getApiBaseUrl = () => {
+  // If VITE_API_URL is explicitly set, use it
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // Auto-detect based on current URL
+  const currentHost = window.location.hostname;
+  
+  // If running on localhost, use local backend
+  if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+    return 'http://localhost:5000/api';
+  }
+  
+  // If running on any production domain (not localhost), use production backend
+  return 'https://oldenerafansite.onrender.com/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
+// Log the API URL being used for debugging
+console.log(`🌐 API Base URL: ${API_BASE_URL}`);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
