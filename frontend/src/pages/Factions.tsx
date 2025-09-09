@@ -29,7 +29,7 @@ const Factions: React.FC = () => {
                 {error?.message || 'Unable to load faction data. Please ensure the backend server is running.'}
               </p>
               <p className="text-sm text-gray-400">
-                Backend should be running on <span className="font-mono">localhost:5000</span>
+                Please check your internet connection and try refreshing the page.
               </p>
             </div>
           </div>

@@ -34,9 +34,6 @@ const Home = () => {
         {isError ? (
           <div className="text-center text-red-400">
             <p>Failed to load news articles</p>
-            <p className="text-sm text-gray-300 mt-2">
-              Make sure the ASP.NET Core backend is running: <code className="bg-gray-700 px-2 py-1 rounded">cd backend && dotnet run</code>
-            </p>
           </div>
         ) : isLoading ? (
           <div className="text-center">
