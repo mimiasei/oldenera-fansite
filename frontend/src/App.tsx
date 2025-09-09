@@ -20,6 +20,7 @@ import Factions from './pages/Factions';
 import FactionDetail from './pages/FactionDetail';
 import Screenshots from './pages/Screenshots';
 import AdminMedia from './pages/AdminMedia';
+import Forum from './pages/Forum';
 import NotificationContainer from './components/NotificationContainer';
 
 function App() {
@@ -93,12 +94,7 @@ function App() {
               <Route path="/factions/:id" element={<FactionDetail />} />
               <Route path="/game-info" element={<Factions />} />
               <Route path="/screenshots" element={<Screenshots />} />
-              <Route path="/forum" element={
-                <div className="container mx-auto px-4 py-8 text-center">
-                  <h1 className="text-4xl font-bold mb-6 font-fantasy">Forum</h1>
-                  <p className="text-lg text-gray-600">Forum coming soon...</p>
-                </div>
-              } />
+              <Route path="/forum" element={<Forum />} />
             </Routes>
           </main>
           
