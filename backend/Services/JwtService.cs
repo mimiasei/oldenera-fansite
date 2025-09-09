@@ -19,11 +19,30 @@ public class JwtService : IJwtService
 
     public string GenerateToken(User user, IList<string> roles)
     {
-        var jwtSettings = _configuration.GetSection("JWT");
-        var secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!);
-        var issuer = jwtSettings["Issuer"];
-        var audience = jwtSettings["Audience"];
-        var expiryInMinutes = int.Parse(jwtSettings["ExpiryInMinutes"]!);
+        // Use environment variables first, then configuration
+        var jwtSecretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY") 
+            ?? _configuration["JWT:SecretKey"] 
+            ?? throw new InvalidOperationException("JWT_SECRET_KEY not found in environment variables or configuration");
+        
+        var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") 
+            ?? _configuration["JWT:Issuer"]
+            ?? throw new InvalidOperationException("JWT_ISSUER not found in environment variables or configuration");
+        
+        var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") 
+            ?? _configuration["JWT:Audience"]
+            ?? throw new InvalidOperationException("JWT_AUDIENCE not found in environment variables or configuration");
+        
+        var expiryInMinutes = int.Parse(_configuration["JWT:ExpiryInMinutes"] ?? "60");
+
+        // Clean any potential whitespace from the key
+        jwtSecretKey = jwtSecretKey.Replace("\n", "").Replace("\r", "").Replace(" ", "").Replace("\t", "").Trim();
+        
+        if (jwtSecretKey.Length < 32)
+        {
+            throw new InvalidOperationException($"JWT SecretKey too short: {jwtSecretKey.Length} characters");
+        }
+
+        var secretKey = Encoding.UTF8.GetBytes(jwtSecretKey);
 
         var claims = new List<Claim>
         {
@@ -77,17 +96,32 @@ public class JwtService : IJwtService
 
     public ClaimsPrincipal GetPrincipalFromToken(string token)
     {
-        var jwtSettings = _configuration.GetSection("JWT");
-        var secretKey = Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]!);
+        // Use environment variables first, then configuration
+        var jwtSecretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY") 
+            ?? _configuration["JWT:SecretKey"] 
+            ?? throw new InvalidOperationException("JWT_SECRET_KEY not found in environment variables or configuration");
+        
+        var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER") 
+            ?? _configuration["JWT:Issuer"]
+            ?? throw new InvalidOperationException("JWT_ISSUER not found in environment variables or configuration");
+        
+        var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE") 
+            ?? _configuration["JWT:Audience"]
+            ?? throw new InvalidOperationException("JWT_AUDIENCE not found in environment variables or configuration");
+
+        // Clean any potential whitespace from the key
+        jwtSecretKey = jwtSecretKey.Replace("\n", "").Replace("\r", "").Replace(" ", "").Replace("\t", "").Trim();
+        
+        var secretKey = Encoding.UTF8.GetBytes(jwtSecretKey);
 
         var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(secretKey),
             ValidateIssuer = true,
-            ValidIssuer = jwtSettings["Issuer"],
+            ValidIssuer = issuer,
             ValidateAudience = true,
-            ValidAudience = jwtSettings["Audience"],
+            ValidAudience = audience,
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero
         };
