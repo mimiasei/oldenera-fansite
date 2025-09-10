@@ -35,7 +35,8 @@ namespace OldenEraFanSite.Api.Migrations
                             ""AccessFailedCount"",
                             ""ProfilePictureUrl"",
                             ""CreatedAt"",
-                            ""UpdatedAt""
+                            ""LastLoginAt"",
+                            ""IsActive""
                         ) VALUES (
                             'admin-seed-user-id-12345',
                             'Site',
@@ -54,7 +55,8 @@ namespace OldenEraFanSite.Api.Migrations
                             0,
                             '/images/avatars/human/human_knight_01.webp',
                             NOW(),
-                            NOW()
+                            NOW(),
+                            true
                         );
 
                         -- Create Admin role if it doesn't exist
