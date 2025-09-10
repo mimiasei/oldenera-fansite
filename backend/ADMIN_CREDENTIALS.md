@@ -6,6 +6,7 @@ The production database migration `20250910090948_SeedAdminUser` creates an admi
 
 **Email:** `admin@oldenerafansite.com`  
 **Password:** `AdminPassword123!`
+**Password Hash:** Generated using ASP.NET Core Identity PasswordHasher for secure authentication
 
 ## Security Notes
 

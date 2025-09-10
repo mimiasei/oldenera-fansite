@@ -46,7 +46,7 @@ namespace OldenEraFanSite.Api.Migrations
                             'admin@oldenerafansite.com',
                             'ADMIN@OLDENERAFANSITE.COM',
                             true,
-                            'AQAAAAIAAYagAAAAEHqZVKJxGvq8zBq8YjH1F6kF9Q9gN7Yx1pR6+xT4J2Mn8vL5zK9wA1sD3fG6hI7jK0l',  -- Password: AdminPassword123!
+                            'AQAAAAIAAYagAAAAEOKUWBR34/HRIkyVInAOcbLVtOSjavm9sH/oj8c/momeHCEeYr2tVYu+fdEE8JRiLA==',  -- Password: AdminPassword123!
                             'AAAAAAAAAAAAAAAAAAAAAAAAAA',
                             gen_random_uuid()::text,
                             false,
