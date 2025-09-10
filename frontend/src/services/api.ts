@@ -28,7 +28,7 @@ const getApiBaseUrl = () => {
   }
   
   // If running on any production domain (not localhost), use production backend
-  return 'https://oldenerafansite.onrender.com/api';
+  return 'https://oldenera-fansite.onrender.com/api';
 };
 
 const API_BASE_URL = getApiBaseUrl();

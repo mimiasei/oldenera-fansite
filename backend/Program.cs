@@ -168,6 +168,7 @@ builder.Services.AddCors(options =>
                 // Production - allow both production domain AND development origins for testing
                 corsBuilder.WithOrigins(
                                "https://oldenwiki.com",           // Production frontend
+                               "https://oldenera-fansite-frontend.onrender.com", // Render frontend deployment
                                "http://localhost:5173",          // Local dev testing against prod API
                                "http://localhost:3000"           // Alternative local dev port
                            )
