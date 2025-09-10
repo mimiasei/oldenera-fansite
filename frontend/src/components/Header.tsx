@@ -1,10 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
+import HamburgerMenu from './HamburgerMenu';
+import MobileNavigation from './MobileNavigation';
 
 const Header = () => {
   const { user, isAuthenticated, isModerator, logout } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Lock body scroll when mobile menu is open
+  useBodyScrollLock(isMobileMenuOpen);
+
+  // Handle escape key to close mobile menu
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isMobileMenuOpen]);
 
   return (
     <header className="fantasy-gradient-unfrozen text-white shadow-lg">
@@ -16,8 +35,16 @@ const Header = () => {
           </Link>
           
           <div className="flex items-center space-x-6">
-            {/* Main Navigation */}
-            <nav className="font-fantasy">
+            {/* Mobile Hamburger Menu */}
+            <div className="lg:hidden">
+              <HamburgerMenu 
+                isOpen={isMobileMenuOpen} 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+              />
+            </div>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:block font-fantasy">
               <ul className="flex space-x-6">
                 <li>
                   <Link 
@@ -93,7 +120,8 @@ const Header = () => {
               </ul>
             </nav>
 
-            {/* Authentication Section */}
+            {/* Desktop Authentication Section */}
+            <div className="hidden lg:block">
             {isAuthenticated ? (
               <div className="relative">
                 <button
@@ -161,8 +189,15 @@ const Header = () => {
                 </Link>
               </div>
             )}
+            </div>
           </div>
         </div>
+
+        {/* Mobile Navigation */}
+        <MobileNavigation 
+          isOpen={isMobileMenuOpen} 
+          onClose={() => setIsMobileMenuOpen(false)} 
+        />
       </div>
     </header>
   );
