@@ -90,3 +90,10 @@ oldenerafansite/
 - when I say "update files" then update the todo, changes and root readme files.
 - when I say "do git" then commit and push
 - by "read files" I mean read the claude, changes and todo files
+
+## Migration Development Guidelines
+- **ALWAYS** run `./scripts/validate-schema.sh` before creating migrations that reference specific columns
+- **NEVER** assume column names - always verify with `dotnet ef migrations script`
+- **CHECK** the User model (Models/User.cs) for actual property names before writing raw SQL
+- **TEST** migrations on fresh database: `dotnet ef database drop --force && dotnet ef database update`
+- **REVIEW** MIGRATION_BEST_PRACTICES.md for detailed schema validation procedures
