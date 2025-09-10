@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useNews } from '../hooks/useSWR';
 import { NewsFilters } from '../services/api';
 import NewsSearch from '../components/NewsSearch';
+import { NewsArticleSkeleton } from '../components/skeletons/NewsArticleSkeleton';
 
 const News = () => {
   const [filters, setFilters] = useState<NewsFilters>({});
@@ -10,9 +11,15 @@ const News = () => {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-        <p className="mt-4 text-gray-600">Loading news articles...</p>
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold mb-8 text-center font-fantasy">
+          Latest News
+        </h1>
+        <div className="space-y-8">
+          {Array.from({ length: 4 }, (_, i) => (
+            <NewsArticleSkeleton key={i} />
+          ))}
+        </div>
       </div>
     );
   }

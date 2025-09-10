@@ -3,6 +3,7 @@ import { useMediaItems, useMediaCategories } from '../hooks/useSWR';
 import { MediaFiltersParams } from '../services/api';
 import { MediaItem } from '../types';
 import MediaLightbox from '../components/MediaLightbox';
+import { MediaGridSkeleton, MediaFiltersSkeleton } from '../components/skeletons/MediaSkeleton';
 
 const Screenshots: React.FC = () => {
   const [filters, setFilters] = useState<MediaFiltersParams>({
@@ -53,11 +54,21 @@ const Screenshots: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-400 mx-auto"></div>
-            <p className="mt-4 text-gray-400">Loading screenshots...</p>
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-primary-900 to-primary-800 text-white">
+          <div className="container mx-auto px-4 py-16 text-center">
+            <h1 className="text-5xl font-bold mb-6 font-fantasy">Screenshots & Media</h1>
+            <p className="text-xl text-primary-100 max-w-3xl mx-auto">
+              Explore stunning visuals from Heroes of Might and Magic: Olden Era. Browse screenshots, 
+              concept art, character designs, and more from the upcoming game.
+            </p>
           </div>
+        </div>
+
+        {/* Content with Skeletons */}
+        <div className="container mx-auto px-4 py-8">
+          <MediaFiltersSkeleton />
+          <MediaGridSkeleton count={12} />
         </div>
       </div>
     );

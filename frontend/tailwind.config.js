@@ -35,6 +35,16 @@ export default {
       fontFamily: {
         'fantasy': ['Cinzel', 'serif'],
         'body': ['Inter', 'sans-serif'],
+      },
+      animation: {
+        'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'skeleton': 'skeleton 1.5s ease-in-out infinite alternate',
+      },
+      keyframes: {
+        skeleton: {
+          '0%': { opacity: '1' },
+          '100%': { opacity: '0.5' },
+        },
       }
     },
   },

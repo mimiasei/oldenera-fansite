@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useFaction, useFactionUnits, useFactionHeroes } from '../hooks/useSWR';
+import { UnitCardSkeleton } from '../components/skeletons/FactionSkeleton';
+import { SkeletonText, Skeleton } from '../components/ui/Skeleton';
 
 const FactionDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -30,9 +32,42 @@ const FactionDetail: React.FC = () => {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
         <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-400 mx-auto"></div>
-            <p className="mt-4 text-gray-400">Loading faction details...</p>
+          {/* Breadcrumb skeleton */}
+          <div className="mb-6">
+            <Skeleton height="20px" className="w-48" />
+          </div>
+
+          {/* Hero section skeleton */}
+          <div className="bg-gray-800 rounded-lg overflow-hidden mb-8">
+            <div className="h-64 bg-gradient-to-r from-primary-900 to-primary-800 flex items-center justify-center">
+              <Skeleton height="128px" className="w-32 rounded-lg" />
+            </div>
+            <div className="p-8">
+              <div className="flex items-center gap-4 mb-4">
+                <Skeleton height="40px" className="w-64" />
+                <Skeleton height="24px" className="w-20 rounded-full" />
+              </div>
+              <SkeletonText lines={2} className="mb-6" />
+              <div className="grid grid-cols-3 gap-4">
+                <Skeleton height="48px" className="rounded-lg" />
+                <Skeleton height="48px" className="rounded-lg" />
+                <Skeleton height="48px" className="rounded-lg" />
+              </div>
+            </div>
+          </div>
+
+          {/* Tab skeleton */}
+          <div className="bg-gray-800 rounded-lg p-6">
+            <div className="flex gap-4 mb-6">
+              <Skeleton height="40px" className="w-24 rounded-md" />
+              <Skeleton height="40px" className="w-20 rounded-md" />
+              <Skeleton height="40px" className="w-20 rounded-md" />
+            </div>
+            <div className="space-y-4">
+              {Array.from({ length: 4 }, (_, i) => (
+                <UnitCardSkeleton key={i} />
+              ))}
+            </div>
           </div>
         </div>
       </div>

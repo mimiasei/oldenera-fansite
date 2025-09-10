@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 import { useAuth } from '../contexts/AuthContext';
 import { fetcher } from '../services/api';
+import { Skeleton } from '../components/ui/Skeleton';
 
 interface DashboardStats {
   users: {
@@ -43,9 +44,55 @@ const AdminDashboard: React.FC = () => {
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+        {/* Header Skeleton */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <Skeleton height="32px" className="w-64 mb-2" />
+            <Skeleton height="16px" className="w-48" />
+          </div>
+        </div>
+
+        {/* Stats Cards Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {Array.from({ length: 6 }, (_, i) => (
+            <div key={i} className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between mb-4">
+                <Skeleton height="20px" className="w-24" />
+                <Skeleton height="32px" className="w-8 rounded-full" />
+              </div>
+              <Skeleton height="36px" className="w-16 mb-2" />
+              <Skeleton height="14px" className="w-20" />
+            </div>
+          ))}
+        </div>
+
+        {/* Recent Activity Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="bg-white rounded-lg shadow p-6">
+            <Skeleton height="24px" className="w-32 mb-4" />
+            <div className="space-y-4">
+              {Array.from({ length: 4 }, (_, i) => (
+                <div key={i} className="flex items-center space-x-4">
+                  <Skeleton height="40px" className="w-10 rounded-full" />
+                  <div className="flex-1">
+                    <Skeleton height="16px" className="w-3/4 mb-1" />
+                    <Skeleton height="14px" className="w-1/2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="bg-white rounded-lg shadow p-6">
+            <Skeleton height="24px" className="w-32 mb-4" />
+            <div className="space-y-4">
+              {Array.from({ length: 4 }, (_, i) => (
+                <div key={i}>
+                  <Skeleton height="16px" className="w-full mb-2" />
+                  <Skeleton height="14px" className="w-2/3" />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useLatestNews } from '../hooks/useSWR';
+import { NewsCardSkeleton } from '../components/skeletons/NewsArticleSkeleton';
 
 const Home = () => {
   const { latestNews, isLoading, isError } = useLatestNews();
@@ -36,9 +37,10 @@ const Home = () => {
             <p>Failed to load news articles</p>
           </div>
         ) : isLoading ? (
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-            <p className="mt-2 text-gray-600">Loading news...</p>
+          <div className="grid md:grid-cols-3 gap-6">
+            {Array.from({ length: 3 }, (_, i) => (
+              <NewsCardSkeleton key={i} />
+            ))}
           </div>
         ) : latestNews.length > 0 ? (
           <div className="grid md:grid-cols-3 gap-6">

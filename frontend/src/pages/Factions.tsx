@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useFactions } from '../hooks/useSWR';
+import { FactionGridSkeleton } from '../components/skeletons/FactionSkeleton';
 
 const Factions: React.FC = () => {
   const { factions, isLoading, isError, error } = useFactions({ includeUnits: true, includeHeroes: true });
@@ -8,11 +9,20 @@ const Factions: React.FC = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-400 mx-auto"></div>
-            <p className="mt-4 text-gray-400">Loading factions...</p>
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-primary-900 to-primary-800 text-white">
+          <div className="container mx-auto px-4 py-16 text-center">
+            <h1 className="text-5xl font-bold mb-6 font-fantasy">Factions</h1>
+            <p className="text-xl text-primary-100 max-w-3xl mx-auto">
+              Discover the mighty factions of Olden Era, each with their unique strengths, 
+              legendary heroes, and powerful armies ready for battle.
+            </p>
           </div>
+        </div>
+
+        {/* Skeleton Grid */}
+        <div className="container mx-auto px-4 py-12">
+          <FactionGridSkeleton count={3} />
         </div>
       </div>
     );
