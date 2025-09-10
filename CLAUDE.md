@@ -97,3 +97,4 @@ oldenerafansite/
 - **CHECK** the User model (Models/User.cs) for actual property names before writing raw SQL
 - **TEST** migrations on fresh database: `dotnet ef database drop --force && dotnet ef database update`
 - **REVIEW** MIGRATION_BEST_PRACTICES.md for detailed schema validation procedures
+- always execute this workflow before creating/updating anything involving db
