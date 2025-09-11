@@ -5,6 +5,7 @@ import { MediaItem } from '../types';
 import MediaLightbox from '../components/MediaLightbox';
 import { MediaGridSkeleton, MediaFiltersSkeleton } from '../components/skeletons/MediaSkeleton';
 import AdminEditButton from '../components/AdminEditButton';
+import OptimizedImage from '../components/OptimizedImage';
 
 const Screenshots: React.FC = () => {
   const [filters, setFilters] = useState<MediaFiltersParams>({
@@ -36,13 +37,13 @@ const Screenshots: React.FC = () => {
     setCurrentIndex(0);
   };
 
-  const openFullscreen = async () => {
+  const openFullscreen = () => {
     if (!selectedMedia) return;
     
     const imgElement = document.querySelector('.lightbox-main-image');
     
     if (imgElement && document.fullscreenEnabled) {
-        await imgElement.requestFullscreen();
+        (imgElement as any).requestFullscreen();
     }
   };
 
@@ -221,9 +222,11 @@ const Screenshots: React.FC = () => {
                 </div>
                 
                 <div className="aspect-video relative overflow-hidden">
-                  {item.thumbnailUrl ? (
-                    <img
-                      src={item.thumbnailUrl}
+                  {item.thumbnailUrl || item.thumbnailWebpUrl ? (
+                    <OptimizedImage
+                      webpSrc={item.thumbnailWebpUrl}
+                      jpegSrc={item.thumbnailUrl}
+                      fallbackSrc={item.thumbnailUrl || item.originalUrl}
                       alt={item.altText || item.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                       loading="lazy"
@@ -231,7 +234,7 @@ const Screenshots: React.FC = () => {
                   ) : (
                     <div className="w-full h-full bg-gray-700 flex items-center justify-center">
                       <svg className="h-12 w-12 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
                   )}

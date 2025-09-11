@@ -20,8 +20,10 @@ public class MediaItem
     // File information
     [Required]
     public string OriginalUrl { get; set; } = string.Empty;
-    public string? ThumbnailUrl { get; set; }
-    public string? LargeUrl { get; set; } // For high-res versions
+    public string? ThumbnailUrl { get; set; }        // JPEG thumbnail
+    public string? ThumbnailWebpUrl { get; set; }    // WebP thumbnail
+    public string? LargeUrl { get; set; }            // JPEG large version
+    public string? LargeWebpUrl { get; set; }        // WebP large version
     
     [StringLength(100)]
     public string? OriginalFileName { get; set; }

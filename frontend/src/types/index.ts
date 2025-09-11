@@ -209,8 +209,10 @@ export interface MediaItem {
   description: string;
   mediaType: string; // "image", "video", "gif"
   originalUrl: string;
-  thumbnailUrl?: string;
-  largeUrl?: string;
+  thumbnailUrl?: string;        // JPEG thumbnail
+  thumbnailWebpUrl?: string;    // WebP thumbnail
+  largeUrl?: string;            // JPEG large version
+  largeWebpUrl?: string;        // WebP large version
   originalFileName?: string;
   fileSize: number;
   width?: number;

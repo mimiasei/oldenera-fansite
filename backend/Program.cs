@@ -154,6 +154,10 @@ builder.Services.AddAuthorization(options =>
 
 // Add custom services
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IImageProcessingService, ImageProcessingService>();
+
+// Add background services
+builder.Services.AddHostedService<ThumbnailGenerationService>();
 
 // Add CORS for React frontend
 builder.Services.AddCors(options =>

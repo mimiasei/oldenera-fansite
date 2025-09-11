@@ -38,7 +38,7 @@ const AdminMediaEdit = () => {
     fetchMediaItem();
   }, [mediaId]);
 
-  const handleSave = (updatedMediaItem: MediaItem) => {
+  const handleSave = () => {
     // Success message could be shown here
     navigate('/admin/media');
   };

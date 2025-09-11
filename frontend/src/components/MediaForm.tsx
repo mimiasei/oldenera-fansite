@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { MediaItem, MediaCategory, Faction } from '../types';
+import { useState } from 'react';
+import { MediaItem } from '../types';
 import { mediaApi } from '../services/api';
 import { useMediaCategories, useFactions } from '../hooks/useSWR';
 
@@ -55,8 +55,8 @@ const MediaForm = ({ mediaItem, onSave, onCancel }: MediaFormProps) => {
         ...formData, // Override with form data
         categoryId: formData.categoryId || 1,
         category: selectedCategory || mediaItem?.category, // Include full category object
-        factionId: formData.factionId || null,
-        faction: formData.factionId ? selectedFaction : null, // Include full faction object or null
+        factionId: formData.factionId || undefined,
+        faction: formData.factionId ? selectedFaction : undefined, // Include full faction object or undefined
         // Ensure required fields are preserved from original media item
         originalUrl: mediaItem?.originalUrl || '',
         fileSize: mediaItem?.fileSize || 0,
@@ -64,7 +64,6 @@ const MediaForm = ({ mediaItem, onSave, onCancel }: MediaFormProps) => {
         sortOrder: mediaItem?.sortOrder || 0,
       };
 
-      let result;
       if (mediaItem?.id) {
         // Update existing media item
         const response = await mediaApi.updateMediaItem(mediaItem.id, mediaData);

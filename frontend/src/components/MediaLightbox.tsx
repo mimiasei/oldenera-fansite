@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { MediaItem } from '../types';
+import OptimizedImage from './OptimizedImage';
 
 interface MediaLightboxProps {
   mediaItem: MediaItem | null;
@@ -7,7 +8,7 @@ interface MediaLightboxProps {
   onNext?: () => void;
   onPrevious?: () => void;
   showNavigation?: boolean;
-  onFullscreen?: void;
+  onFullscreen?: () => void;
 }
 
 const MediaLightbox: React.FC<MediaLightboxProps> = ({
@@ -120,10 +121,13 @@ const MediaLightbox: React.FC<MediaLightboxProps> = ({
               className="max-w-full max-h-full object-contain"
             />
           ) : (
-            <img
-              src={mediaItem.largeUrl || mediaItem.originalUrl}
+            <OptimizedImage
+              webpSrc={mediaItem.largeWebpUrl}
+              jpegSrc={mediaItem.largeUrl}
+              fallbackSrc={mediaItem.largeUrl || mediaItem.originalUrl}
               alt={mediaItem.altText || mediaItem.title}
               className="lightbox-main-image max-w-full max-h-full object-contain"
+              loading="eager"
             />
           )}
         </div>
