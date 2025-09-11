@@ -5,10 +5,21 @@ using Microsoft.IdentityModel.Tokens;
 using OldenEraFanSite.Api.Data;
 using OldenEraFanSite.Api.Models;
 using OldenEraFanSite.Api.Services;
+using OldenEraFanSite.Api.Commands;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using System.Text;
 using DotNetEnv;
 
 Console.WriteLine("=== Starting OldenEra API ===");
+
+// Check if running CLI commands
+if (args.Length > 0)
+{
+    // This is a CLI command, not the web server
+    await RunCliCommandsAsync(args);
+    return;
+}
 
 // Load .env file if it exists (for local development)
 if (File.Exists(".env"))
@@ -269,6 +280,83 @@ app.MapGet("/health", () => new {
 });
 
 app.Run();
+
+// CLI Command Runner Function
+async Task RunCliCommandsAsync(string[] arguments)
+{
+    Console.WriteLine("🛠️  Running CLI command...");
+    
+    try
+    {
+        // Build minimal service collection for CLI
+        var services = new ServiceCollection();
+        
+        // Load .env for CLI commands too
+        if (File.Exists(".env"))
+        {
+            Env.Load();
+        }
+        
+        // Add configuration
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: false)
+            .AddEnvironmentVariables()
+            .Build();
+        
+        services.AddSingleton<IConfiguration>(configuration);
+        
+        // Add database context
+        var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        
+        if (!string.IsNullOrEmpty(databaseUrl))
+        {
+            var uri = new Uri(databaseUrl);
+            var host = uri.Host;
+            var port = uri.Port;
+            var database = uri.AbsolutePath.TrimStart('/');
+            var userInfo = uri.UserInfo.Split(':');
+            var username = userInfo[0];
+            var password = userInfo.Length > 1 ? userInfo[1] : "";
+            var isLocal = host == "localhost" || host == "127.0.0.1";
+            var sslMode = isLocal ? "Disable" : "Require";
+            var trustCert = isLocal ? "" : ";Trust Server Certificate=true";
+            connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password};SSL Mode={sslMode}{trustCert}";
+        }
+        
+        services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
+        
+        // Add other required services
+        services.AddSingleton<IWebHostEnvironment>(new CustomWebHostEnvironment());
+        services.AddScoped<IImageProcessingService, ImageProcessingService>();
+        services.AddLogging();
+        
+        var serviceProvider = services.BuildServiceProvider();
+        
+        // Run the command
+        var commandRunner = new CommandRunner(serviceProvider);
+        var exitCode = await commandRunner.RunAsync(arguments);
+        
+        Environment.Exit(exitCode);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"💥 CLI execution failed: {ex.Message}");
+        Environment.Exit(1);
+    }
+}
+
+// Custom WebHostEnvironment for CLI
+public class CustomWebHostEnvironment : IWebHostEnvironment
+{
+    public string ApplicationName { get; set; } = "OldenEraFanSite.Api";
+    public IFileProvider ContentRootFileProvider { get; set; } = null!;
+    public string ContentRootPath { get; set; } = Directory.GetCurrentDirectory();
+    public string EnvironmentName { get; set; } = "Production";
+    public IFileProvider WebRootFileProvider { get; set; } = null!;
+    public string WebRootPath { get; set; } = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+}
 
 // Make Program class public for testing
 public partial class Program { }
