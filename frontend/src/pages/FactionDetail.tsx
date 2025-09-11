@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useFaction, useFactionUnits, useFactionHeroes } from '../hooks/useSWR';
 import { UnitCardSkeleton } from '../components/skeletons/FactionSkeleton';
 import { SkeletonText, Skeleton } from '../components/ui/Skeleton';
+import AdminEditButton from '../components/AdminEditButton';
 
 const FactionDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -135,7 +136,12 @@ const FactionDetail: React.FC = () => {
           />
         )}
         <div className="relative bg-gradient-to-r from-primary-900/90 to-primary-800/90 text-white">
-          <div className="container mx-auto px-4 py-16">
+          <div className="container mx-auto px-4 py-16 relative">
+            {/* Admin Edit Button */}
+            <div className="absolute top-4 right-4">
+              <AdminEditButton to={`/admin/factions/${faction.id}/edit`} />
+            </div>
+            
             <div className="flex flex-col md:flex-row items-center gap-8">
               {/* Faction Logo */}
               <div className="flex-shrink-0">

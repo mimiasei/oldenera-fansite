@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import HamburgerMenu from './HamburgerMenu';
 import MobileNavigation from './MobileNavigation';
+import ThemeToggle from './ThemeToggle';
 
 const Header = () => {
   const { user, isAuthenticated, isModerator, logout } = useAuth();
@@ -94,22 +95,22 @@ const Header = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                     </button>
-                    <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                      <Link to="/admin/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <div className="absolute left-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                      <Link to="/admin/dashboard" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                         Dashboard
                       </Link>
-                      <Link to="/admin/news" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      <Link to="/admin/news" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                         Manage News
                       </Link>
-                      <Link to="/admin/media" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      <Link to="/admin/media" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                         Manage Media
                       </Link>
                       {user?.roles?.includes('Admin') && (
                         <>
-                          <Link to="/admin/users" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                          <Link to="/admin/users" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                             Manage Users
                           </Link>
-                          <Link to="/admin/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                          <Link to="/admin/settings" className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                             Settings
                           </Link>
                         </>
@@ -153,10 +154,10 @@ const Header = () => {
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-50">
                     <Link
                       to="/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                       onClick={() => setIsDropdownOpen(false)}
                     >
                       Profile
@@ -166,7 +167,7 @@ const Header = () => {
                         logout();
                         setIsDropdownOpen(false);
                       }}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                     >
                       Sign Out
                     </button>
@@ -190,6 +191,11 @@ const Header = () => {
               </div>
             )}
             </div>
+
+              {/* Desktop Theme Toggle */}
+              <div className="hidden lg:block">
+                  <ThemeToggle />
+              </div>
           </div>
         </div>
 

@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { AppProvider } from './store';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -20,14 +21,16 @@ import Factions from './pages/Factions';
 import FactionDetail from './pages/FactionDetail';
 import Screenshots from './pages/Screenshots';
 import AdminMedia from './pages/AdminMedia';
+import AdminMediaEdit from './pages/AdminMediaEdit';
 import Forum from './pages/Forum';
 import NotificationContainer from './components/NotificationContainer';
 
 function App() {
   return (
-    <AuthProvider>
-      <AppProvider>
-        <Router>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppProvider>
+          <Router>
           <div className="min-h-screen flex flex-col">
           <Header />
           
@@ -88,6 +91,11 @@ function App() {
                   <AdminMedia />
                 </ProtectedRoute>
               } />
+              <Route path="/admin/media/:id/edit" element={
+                <ProtectedRoute requireModerator={true}>
+                  <AdminMediaEdit />
+                </ProtectedRoute>
+              } />
               
               {/* Game Information Routes */}
               <Route path="/factions" element={<Factions />} />
@@ -101,9 +109,10 @@ function App() {
           <Footer />
           <NotificationContainer />
           </div>
-        </Router>
-      </AppProvider>
-    </AuthProvider>
+          </Router>
+        </AppProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

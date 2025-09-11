@@ -53,7 +53,7 @@ namespace OldenEraFanSite.Api.Migrations
                             false,
                             true,
                             0,
-                            '/images/avatars/human/human_knight_01.webp',
+                            '/images/icons/avatars/Human_01_nobg.webp',
                             NOW(),
                             NOW(),
                             true

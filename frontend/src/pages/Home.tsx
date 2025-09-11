@@ -31,7 +31,7 @@ const Home = () => {
 
       {/* Latest News Section */}
       <section className="container rounded-xl mx-auto px-4 py-6" style={{ backgroundColor: `rgba(255, 255, 255, 0.05)`}}>
-        <h2 className="text-gray-400 text-3xl font-bold mb-8 text-center">Latest News</h2>
+        <h2 className="text-gray-400 dark:text-gray-300 text-3xl font-bold mb-8 text-center">Latest News</h2>
         {isError ? (
           <div className="text-center text-red-400">
             <p>Failed to load news articles</p>
@@ -53,15 +53,15 @@ const Home = () => {
                     className="w-full h-48 object-cover rounded-lg mb-4"
                   />
                 )}
-                <h3 className="text-xl font-semibold mb-2">{article.title}</h3>
-                <p className="text-gray-600 mb-4">{article.summary}</p>
+                <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">{article.title}</h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">{article.summary}</p>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     {new Date(article.publishedAt).toLocaleDateString()}
                   </span>
                   <Link 
                     to={`/news/${article.id}`}
-                    className="text-primary-600 hover:text-primary-700 font-medium"
+                    className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
                   >
                     Read More →
                   </Link>
@@ -71,8 +71,8 @@ const Home = () => {
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-gray-200 mb-4">No news articles available yet.</p>
-            <p className="text-gray-100">Check back soon for the latest updates!</p>
+            <p className="text-gray-200 dark:text-gray-300 mb-4">No news articles available yet.</p>
+            <p className="text-gray-100 dark:text-gray-200">Check back soon for the latest updates!</p>
           </div>
         )}
         
@@ -88,8 +88,8 @@ const Home = () => {
       {/* Game Info Teaser */}
       <section className="py-8">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-gray-300 text-3xl font-bold mb-6">About Olden Era</h2>
-          <p className="text-lg text-gray-100 max-w-3xl mx-auto mb-8">
+          <h2 className="text-gray-300 dark:text-gray-200 text-3xl font-bold mb-6">About Olden Era</h2>
+          <p className="text-lg text-gray-100 dark:text-gray-200 max-w-3xl mx-auto mb-8">
             Heroes of Might and Magic: Olden Era brings back the classic turn-based 
             strategy gameplay that fans have loved for decades. With updated graphics, 
             enhanced mechanics and new content, it promises to deliver the authentic 

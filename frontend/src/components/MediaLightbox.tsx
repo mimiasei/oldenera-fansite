@@ -7,6 +7,7 @@ interface MediaLightboxProps {
   onNext?: () => void;
   onPrevious?: () => void;
   showNavigation?: boolean;
+  onFullscreen?: void;
 }
 
 const MediaLightbox: React.FC<MediaLightboxProps> = ({
@@ -15,6 +16,7 @@ const MediaLightbox: React.FC<MediaLightboxProps> = ({
   onNext,
   onPrevious,
   showNavigation = false,
+  onFullscreen,
 }) => {
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
@@ -58,15 +60,32 @@ const MediaLightbox: React.FC<MediaLightboxProps> = ({
 
       {/* Lightbox Content */}
       <div className="relative max-w-7xl max-h-full mx-4 flex flex-col">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10 text-white hover:text-gray-300 transition-colors bg-black/50 rounded-full p-2"
-        >
-          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        {/* Top-right button group */}
+        <div className="absolute top-4 right-4 z-10 flex space-x-2">
+          {/* Fullscreen Button (only for images) */}
+          {mediaItem.mediaType === 'image' && (
+            <button
+              onClick={onFullscreen}
+              className="text-white hover:text-gray-300 transition-colors bg-black/50 rounded-full p-2"
+              title="Fullscreen"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V6a2 2 0 012-2h2M4 16v2a2 2 0 002 2h2m8-16h2a2 2 0 012 2v2m-4 12h2a2 2 0 002-2v-2" />
+              </svg>
+            </button>
+          )}
+          
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="text-white hover:text-gray-300 transition-colors bg-black/50 rounded-full p-2"
+            title="Close"
+          >
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
         {/* Navigation Buttons */}
         {showNavigation && onPrevious && (
@@ -104,7 +123,7 @@ const MediaLightbox: React.FC<MediaLightboxProps> = ({
             <img
               src={mediaItem.largeUrl || mediaItem.originalUrl}
               alt={mediaItem.altText || mediaItem.title}
-              className="max-w-full max-h-full object-contain"
+              className="lightbox-main-image max-w-full max-h-full object-contain"
             />
           )}
         </div>

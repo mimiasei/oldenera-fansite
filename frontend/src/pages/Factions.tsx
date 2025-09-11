@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useFactions } from '../hooks/useSWR';
 import { FactionGridSkeleton } from '../components/skeletons/FactionSkeleton';
+import AdminEditButton from '../components/AdminEditButton';
 
 const Factions: React.FC = () => {
   const { factions, isLoading, isError, error } = useFactions({ includeUnits: true, includeHeroes: true });
@@ -75,14 +76,19 @@ const Factions: React.FC = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {factions.map((faction) => (
-              <Link
-                key={faction.id}
-                to={`/factions/${faction.id}`}
-                className="group"
-              >
-                <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300">
-                  {/* Faction Banner/Logo */}
-                  <div className="relative h-48 bg-gradient-to-br from-primary-900 to-primary-700 flex items-center justify-center">
+              <div key={faction.id} className="relative">
+                {/* Admin Edit Button */}
+                <div className="absolute top-2 right-2 z-10">
+                  <AdminEditButton to={`/admin/factions/${faction.id}/edit`} />
+                </div>
+                
+                <Link
+                  to={`/factions/${faction.id}`}
+                  className="group block"
+                >
+                  <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300">
+                    {/* Faction Banner/Logo */}
+                    <div className="relative h-48 bg-gradient-to-br from-primary-900 to-primary-700 flex items-center justify-center">
                     {faction.logoUrl || faction.bannerUrl ? (
                       <img
                         src={faction.logoUrl || faction.bannerUrl}
@@ -160,6 +166,7 @@ const Factions: React.FC = () => {
                   </div>
                 </div>
               </Link>
+            </div>
             ))}
           </div>
         )}

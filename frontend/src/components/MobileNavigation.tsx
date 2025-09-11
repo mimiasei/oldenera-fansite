@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import ThemeToggle from './ThemeToggle';
 
 interface MobileNavigationProps {
   isOpen: boolean;
@@ -40,15 +41,19 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({ isOpen, onClose }) 
           <div className="text-white font-fantasy">
             <div className="text-lg font-bold">Menu</div>
           </div>
-          <button
-            onClick={onClose}
-            className="text-white hover:text-primary-200 transition-colors p-2"
-            aria-label="Close menu"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          <div className="flex items-center space-x-3">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+            <button
+              onClick={onClose}
+              className="text-white hover:text-primary-200 transition-colors p-2"
+              aria-label="Close menu"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Navigation Links */}

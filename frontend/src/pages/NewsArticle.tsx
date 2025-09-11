@@ -1,6 +1,7 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useNewsArticle } from '../hooks/useSWR';
 import DisqusComments from '../components/DisqusComments';
+import AdminEditButton from '../components/AdminEditButton';
 
 const NewsArticle = () => {
   const { id } = useParams<{ id: string }>();
@@ -57,7 +58,12 @@ const NewsArticle = () => {
         </nav>
 
         {/* Article Header */}
-        <header className="mb-8">
+        <header className="mb-8 relative">
+          {/* Admin Edit Button */}
+          <div className="absolute top-0 right-0">
+            <AdminEditButton to={`/admin/news/${article.id}/edit`} />
+          </div>
+          
           {/* Tags */}
           {article.tags.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">

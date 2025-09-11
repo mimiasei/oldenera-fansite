@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useMediaItems, useMediaCategories } from '../hooks/useSWR';
 import { mediaApi, MediaFiltersParams } from '../services/api';
 import { MediaItem } from '../types';
@@ -258,6 +259,12 @@ const AdminMedia: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end space-x-2">
+                        <Link
+                          to={`/admin/media/${item.id}/edit`}
+                          className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-primary-700 bg-primary-100 hover:bg-primary-200"
+                        >
+                          Edit
+                        </Link>
                         <button
                           onClick={() => handleToggleApproval(item)}
                           disabled={updatingId === item.id}

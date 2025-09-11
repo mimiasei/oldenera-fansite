@@ -4,6 +4,7 @@ import { MediaFiltersParams } from '../services/api';
 import { MediaItem } from '../types';
 import MediaLightbox from '../components/MediaLightbox';
 import { MediaGridSkeleton, MediaFiltersSkeleton } from '../components/skeletons/MediaSkeleton';
+import AdminEditButton from '../components/AdminEditButton';
 
 const Screenshots: React.FC = () => {
   const [filters, setFilters] = useState<MediaFiltersParams>({
@@ -33,6 +34,16 @@ const Screenshots: React.FC = () => {
   const closeLightbox = () => {
     setSelectedMedia(null);
     setCurrentIndex(0);
+  };
+
+  const openFullscreen = async () => {
+    if (!selectedMedia) return;
+    
+    const imgElement = document.querySelector('.lightbox-main-image');
+    
+    if (imgElement && document.fullscreenEnabled) {
+        await imgElement.requestFullscreen();
+    }
   };
 
   const goToNext = () => {
@@ -198,9 +209,17 @@ const Screenshots: React.FC = () => {
             {mediaItems.map((item, index) => (
               <div
                 key={item.id}
-                className="bg-gray-800/50 rounded-lg overflow-hidden hover:bg-gray-800/70 transition-all duration-300 hover:scale-105 cursor-pointer group"
+                className="bg-gray-800/50 rounded-lg overflow-hidden hover:bg-gray-800/70 transition-all duration-300 hover:scale-105 cursor-pointer group relative"
                 onClick={() => openLightbox(item, index)}
               >
+                {/* Admin Edit Button */}
+                <div 
+                  className="absolute top-2 right-2 z-10"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <AdminEditButton to={`/admin/media/${item.id}/edit`} />
+                </div>
+                
                 <div className="aspect-video relative overflow-hidden">
                   {item.thumbnailUrl ? (
                     <img
@@ -218,7 +237,7 @@ const Screenshots: React.FC = () => {
                   )}
                   
                   {/* Media type indicator */}
-                  <div className="absolute top-2 right-2">
+                  <div className="absolute top-2 left-2">
                     {item.mediaType === 'video' && (
                       <div className="bg-black/70 text-white px-2 py-1 rounded text-xs flex items-center">
                         <svg className="h-3 w-3 mr-1" fill="currentColor" viewBox="0 0 24 24">
@@ -282,6 +301,7 @@ const Screenshots: React.FC = () => {
         onNext={currentIndex < mediaItems.length - 1 ? goToNext : undefined}
         onPrevious={currentIndex > 0 ? goToPrevious : undefined}
         showNavigation={mediaItems.length > 1}
+        onFullscreen={openFullscreen}
       />
     </div>
   );
