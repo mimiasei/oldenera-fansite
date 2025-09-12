@@ -16,34 +16,33 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: 📊 Check Sync Status
-        id: status
+      - name: 📊 Get Sync Status
+        id: get_response
         run: |
           echo "Checking sync status..."
-          
-          # Simple approach - get status and parse directly without storing raw JSON
           RESPONSE=$(curl -s "https://oldenera-fansite.onrender.com/api/thumbnailsync/status")
-          echo "API Response received successfully"
+          echo "API Response received"
+          echo "response=$RESPONSE" >> $GITHUB_OUTPUT
           
-          # Parse using jq with string input
-          PENDING_COUNT=$(echo "$RESPONSE" | jq -r '.totalPending // 0' 2>/dev/null || echo "0")
-          echo "Extracted totalPending: $PENDING_COUNT"
+      - name: 📊 Parse Status Response  
+        id: status
+        run: |
+          PENDING_COUNT=${{ fromJson(steps.get_response.outputs.response).totalPending }}
+          PENDING_THUMBNAILS=${{ fromJson(steps.get_response.outputs.response).pendingThumbnails }}
+          PENDING_LARGE=${{ fromJson(steps.get_response.outputs.response).pendingLarge }}
           
-          # Simple validation
-          if [[ "$PENDING_COUNT" =~ ^[0-9]+$ ]]; then
-            echo "pending_count=$PENDING_COUNT" >> $GITHUB_OUTPUT
-            
-            if [ "$PENDING_COUNT" = "0" ]; then
-              echo "No pending thumbnails found"
-              echo "has_pending=false" >> $GITHUB_OUTPUT
-            else
-              echo "Found $PENDING_COUNT pending thumbnails"
-              echo "has_pending=true" >> $GITHUB_OUTPUT
-            fi
-          else
-            echo "Failed to parse count, defaulting to 0"
-            echo "pending_count=0" >> $GITHUB_OUTPUT
+          echo "Parsed values: total=$PENDING_COUNT, thumbnails=$PENDING_THUMBNAILS, large=$PENDING_LARGE"
+          
+          echo "pending_count=$PENDING_COUNT" >> $GITHUB_OUTPUT
+          echo "pending_thumbnails=$PENDING_THUMBNAILS" >> $GITHUB_OUTPUT
+          echo "pending_large=$PENDING_LARGE" >> $GITHUB_OUTPUT
+          
+          if [ "$PENDING_COUNT" = "0" ]; then
+            echo "No pending thumbnails found"
             echo "has_pending=false" >> $GITHUB_OUTPUT
+          else
+            echo "Found $PENDING_COUNT pending thumbnails ($PENDING_THUMBNAILS thumbnails + $PENDING_LARGE large)"
+            echo "has_pending=true" >> $GITHUB_OUTPUT
           fi
 
       - name: 📦 Download Pending Thumbnails
