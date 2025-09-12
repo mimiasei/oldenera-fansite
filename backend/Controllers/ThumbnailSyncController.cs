@@ -217,8 +217,13 @@ public class ThumbnailSyncController : ControllerBase
 
         if (string.IsNullOrEmpty(gitHubToken) || string.IsNullOrEmpty(repoOwner) || string.IsNullOrEmpty(repoName))
         {
+            _logger.LogError("🔧 GitHub configuration missing: Token={HasToken}, Owner={RepoOwner}, Name={RepoName}", 
+                !string.IsNullOrEmpty(gitHubToken), repoOwner ?? "MISSING", repoName ?? "MISSING");
             throw new InvalidOperationException("GitHub configuration missing for manual sync trigger");
         }
+
+        _logger.LogInformation("🔧 GitHub API call: Owner={RepoOwner}, Name={RepoName}, URL=https://api.github.com/repos/{RepoOwner}/{RepoName}/dispatches", 
+            repoOwner, repoName, repoOwner, repoName);
 
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {gitHubToken}");
@@ -242,6 +247,14 @@ public class ThumbnailSyncController : ControllerBase
         if (!response.IsSuccessStatusCode)
         {
             var errorContent = await response.Content.ReadAsStringAsync();
+            _logger.LogError("🔧 GitHub API failed: Status={StatusCode}, URL=https://api.github.com/repos/{RepoOwner}/{RepoName}/dispatches, Response={ErrorContent}", 
+                response.StatusCode, repoOwner, repoName, errorContent);
+            
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                throw new HttpRequestException($"GitHub repository not found or token lacks permissions. Check: 1) Repository exists: {repoOwner}/{repoName}, 2) Token has 'repo' permissions, 3) Token is valid");
+            }
+            
             throw new HttpRequestException($"GitHub API request failed: {response.StatusCode} - {errorContent}");
         }
 

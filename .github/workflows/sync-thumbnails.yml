@@ -20,24 +20,37 @@ jobs:
         id: status
         run: |
           echo "Checking sync status..."
-          STATUS=$(curl -s "https://oldenera-fansite.onrender.com/api/thumbnailsync/status")
+          
+          # Get raw response and save to file for easier processing
+          curl -s "https://oldenera-fansite.onrender.com/api/thumbnailsync/status" > /tmp/status.json
+          
           echo "Raw API response:"
-          echo "$STATUS"
+          cat /tmp/status.json
           echo ""
           
-          # Validate JSON first
-          if ! echo "$STATUS" | jq empty 2>/dev/null; then
+          # Validate JSON structure
+          if ! jq empty /tmp/status.json 2>/dev/null; then
             echo "❌ Invalid JSON response from API"
-            echo "Response was: $STATUS"
+            echo "Response content:"
+            cat /tmp/status.json
             exit 1
           fi
           
-          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          # Store raw response for debugging
+          echo "status=$(cat /tmp/status.json)" >> $GITHUB_OUTPUT
           
-          # Parse with error handling and fallback to 0
-          PENDING_COUNT=$(echo "$STATUS" | jq -r '.totalPending // 0')
-          PENDING_THUMBNAILS=$(echo "$STATUS" | jq -r '.pendingThumbnails // 0')
-          PENDING_LARGE=$(echo "$STATUS" | jq -r '.pendingLarge // 0')
+          # Extract values with more robust error handling
+          PENDING_COUNT=$(jq -r '.totalPending // 0' /tmp/status.json 2>/dev/null || echo "0")
+          PENDING_THUMBNAILS=$(jq -r '.pendingThumbnails // 0' /tmp/status.json 2>/dev/null || echo "0")
+          PENDING_LARGE=$(jq -r '.pendingLarge // 0' /tmp/status.json 2>/dev/null || echo "0")
+          
+          # Validate the extracted values
+          if ! [[ "$PENDING_COUNT" =~ ^[0-9]+$ ]]; then
+            echo "❌ Invalid totalPending value: $PENDING_COUNT"
+            PENDING_COUNT=0
+          fi
+          
+          echo "Parsed values: total=$PENDING_COUNT, thumbnails=$PENDING_THUMBNAILS, large=$PENDING_LARGE"
           
           echo "pending_count=$PENDING_COUNT" >> $GITHUB_OUTPUT
           echo "pending_thumbnails=$PENDING_THUMBNAILS" >> $GITHUB_OUTPUT
@@ -50,6 +63,9 @@ jobs:
             echo "Found $PENDING_COUNT pending thumbnails ($PENDING_THUMBNAILS thumbnails + $PENDING_LARGE large)"
             echo "has_pending=true" >> $GITHUB_OUTPUT
           fi
+          
+          # Cleanup
+          rm -f /tmp/status.json
 
       - name: 📦 Download Pending Thumbnails
         if: steps.status.outputs.has_pending == 'true'
