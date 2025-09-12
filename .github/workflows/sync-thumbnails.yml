@@ -21,51 +21,30 @@ jobs:
         run: |
           echo "Checking sync status..."
           
-          # Get raw response and save to file for easier processing
-          curl -s "https://oldenera-fansite.onrender.com/api/thumbnailsync/status" > /tmp/status.json
+          # Simple approach - get status and parse directly without storing raw JSON
+          RESPONSE=$(curl -s "https://oldenera-fansite.onrender.com/api/thumbnailsync/status")
+          echo "API Response received successfully"
           
-          echo "Raw API response:"
-          cat /tmp/status.json
-          echo ""
+          # Parse using jq with string input
+          PENDING_COUNT=$(echo "$RESPONSE" | jq -r '.totalPending // 0' 2>/dev/null || echo "0")
+          echo "Extracted totalPending: $PENDING_COUNT"
           
-          # Validate JSON structure
-          if ! jq empty /tmp/status.json 2>/dev/null; then
-            echo "❌ Invalid JSON response from API"
-            echo "Response content:"
-            cat /tmp/status.json
-            exit 1
-          fi
-          
-          # Note: Not storing raw JSON in output to avoid formatting issues
-          # The parsed values below are what we actually need
-          
-          # Extract values with more robust error handling
-          PENDING_COUNT=$(jq -r '.totalPending // 0' /tmp/status.json 2>/dev/null || echo "0")
-          PENDING_THUMBNAILS=$(jq -r '.pendingThumbnails // 0' /tmp/status.json 2>/dev/null || echo "0")
-          PENDING_LARGE=$(jq -r '.pendingLarge // 0' /tmp/status.json 2>/dev/null || echo "0")
-          
-          # Validate the extracted values
-          if ! [[ "$PENDING_COUNT" =~ ^[0-9]+$ ]]; then
-            echo "❌ Invalid totalPending value: $PENDING_COUNT"
-            PENDING_COUNT=0
-          fi
-          
-          echo "Parsed values: total=$PENDING_COUNT, thumbnails=$PENDING_THUMBNAILS, large=$PENDING_LARGE"
-          
-          echo "pending_count=$PENDING_COUNT" >> $GITHUB_OUTPUT
-          echo "pending_thumbnails=$PENDING_THUMBNAILS" >> $GITHUB_OUTPUT
-          echo "pending_large=$PENDING_LARGE" >> $GITHUB_OUTPUT
-          
-          if [ "$PENDING_COUNT" = "0" ] || [ "$PENDING_COUNT" = "null" ]; then
-            echo "No pending thumbnails found"
-            echo "has_pending=false" >> $GITHUB_OUTPUT
+          # Simple validation
+          if [[ "$PENDING_COUNT" =~ ^[0-9]+$ ]]; then
+            echo "pending_count=$PENDING_COUNT" >> $GITHUB_OUTPUT
+            
+            if [ "$PENDING_COUNT" = "0" ]; then
+              echo "No pending thumbnails found"
+              echo "has_pending=false" >> $GITHUB_OUTPUT
+            else
+              echo "Found $PENDING_COUNT pending thumbnails"
+              echo "has_pending=true" >> $GITHUB_OUTPUT
+            fi
           else
-            echo "Found $PENDING_COUNT pending thumbnails ($PENDING_THUMBNAILS thumbnails + $PENDING_LARGE large)"
-            echo "has_pending=true" >> $GITHUB_OUTPUT
+            echo "Failed to parse count, defaulting to 0"
+            echo "pending_count=0" >> $GITHUB_OUTPUT
+            echo "has_pending=false" >> $GITHUB_OUTPUT
           fi
-          
-          # Cleanup
-          rm -f /tmp/status.json
 
       - name: 📦 Download Pending Thumbnails
         if: steps.status.outputs.has_pending == 'true'
