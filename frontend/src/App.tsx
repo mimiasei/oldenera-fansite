@@ -24,10 +24,12 @@ import AdminMedia from './pages/AdminMedia';
 import AdminMediaEdit from './pages/AdminMediaEdit';
 import Forum from './pages/Forum';
 import NotificationContainer from './components/NotificationContainer';
+import { Analytics } from '@vercel/analytics/react';
 
 function App() {
   return (
-    <ThemeProvider>
+    <div>
+      <ThemeProvider>
       <AuthProvider>
         <AppProvider>
           <Router>
@@ -113,6 +115,9 @@ function App() {
         </AppProvider>
       </AuthProvider>
     </ThemeProvider>
+      
+      <Analytics />
+    </div>
   );
 }
 
