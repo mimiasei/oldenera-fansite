@@ -396,6 +396,10 @@ export const adminApi = {
   // Thumbnail Regeneration
   regenerateThumbnails: (request: RegenerateThumbnailsRequest) =>
     api.post<RegenerateThumbnailsResponse>('/admin/regenerate-thumbnails', request),
+
+  // Thumbnail Sync
+  triggerManualSync: () =>
+    api.post('/thumbnailsync/trigger-manual'),
 };
 
 // SWR fetcher function

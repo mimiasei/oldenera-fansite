@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 import { useAuth } from '../contexts/AuthContext';
-import { fetcher } from '../services/api';
+import { fetcher, adminApi } from '../services/api';
 import { Skeleton } from '../components/ui/Skeleton';
 
 interface DashboardStats {
@@ -48,26 +48,16 @@ const AdminDashboard: React.FC = () => {
     setSyncMessage(null);
     
     try {
-      const response = await fetch('/api/thumbnailsync/trigger-manual', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const result = await response.json();
+      const response = await adminApi.triggerManualSync();
+      const result = response.data;
       
-      if (response.ok) {
-        setSyncMessage(result.message);
-        if (result.triggered) {
-          setTimeout(() => setSyncMessage(null), 5000);
-        }
-      } else {
-        setSyncMessage(result.message || 'Failed to trigger sync');
+      setSyncMessage(result.message);
+      if (result.triggered) {
+        setTimeout(() => setSyncMessage(null), 5000);
       }
-    } catch (error) {
-      setSyncMessage('Failed to connect to server');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to connect to server';
+      setSyncMessage(errorMessage);
     } finally {
       setIsSyncing(false);
     }
