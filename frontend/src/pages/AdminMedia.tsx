@@ -12,7 +12,6 @@ const AdminMedia: React.FC = () => {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [regeneratingThumbnails, setRegeneratingThumbnails] = useState(false);
-  const [thumbnailResults, setThumbnailResults] = useState<any[]>([]);
 
   const { mediaItems, isLoading, isError, refetch } = useMediaItems(filters);
   const { categories } = useMediaCategories();
@@ -60,13 +59,11 @@ const AdminMedia: React.FC = () => {
     if (!confirmed) return;
 
     setRegeneratingThumbnails(true);
-    setThumbnailResults([]);
     
     try {
       const request: RegenerateThumbnailsRequest = { force };
       const response = await adminApi.regenerateThumbnails(request);
       
-      setThumbnailResults(response.data.results || []);
       refetch(); // Refresh media items to show new thumbnails
       
       alert(response.data.message);
