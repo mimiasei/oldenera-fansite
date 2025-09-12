@@ -169,6 +169,7 @@ builder.Services.AddScoped<IImageProcessingService, ImageProcessingService>();
 
 // Add background services
 builder.Services.AddHostedService<ThumbnailGenerationService>();
+builder.Services.AddHostedService<ThumbnailBatchSyncService>();
 
 // Add CORS for React frontend
 builder.Services.AddCors(options =>

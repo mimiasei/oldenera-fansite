@@ -197,7 +197,22 @@ public class ImageProcessingService : IImageProcessingService
 
     public string GetPublicUrl(string filePath)
     {
-        // Convert absolute path to relative URL
+        // For temporary thumbnails, return the final frontend URL where they will be served
+        if (filePath.Contains("temp") && (filePath.Contains("thumbnails") || filePath.Contains("large")))
+        {
+            var fileName = Path.GetFileName(filePath);
+            
+            if (filePath.Contains("thumbnails"))
+            {
+                return $"/images/screenshots/thumbnails/{fileName}";
+            }
+            else if (filePath.Contains("large"))
+            {
+                return $"/images/screenshots/large/{fileName}";
+            }
+        }
+        
+        // Fallback to original logic for other files
         var wwwrootPath = Path.Combine(_environment.WebRootPath);
         var relativePath = Path.GetRelativePath(wwwrootPath, filePath);
         
@@ -214,12 +229,14 @@ public class ImageProcessingService : IImageProcessingService
 
     private string GetThumbnailDir()
     {
-        return Path.Combine(_environment.WebRootPath, "uploads", "media", "thumbnails");
+        // Save thumbnails temporarily in backend for batch processing
+        return Path.Combine(_environment.WebRootPath, "temp", "thumbnails");
     }
 
     private string GetLargeDir()
     {
-        return Path.Combine(_environment.WebRootPath, "uploads", "media", "large");
+        // Save large versions temporarily in backend for batch processing  
+        return Path.Combine(_environment.WebRootPath, "temp", "large");
     }
 
     private void EnsureDirectoriesExist()

@@ -1,0 +1,99 @@
+name: 🖼️ Sync Generated Thumbnails
+
+on:
+  repository_dispatch:
+    types: [sync-thumbnails]
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  sync-thumbnails:
+    name: Download and Deploy Thumbnails
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: 📊 Check Sync Status
+        id: status
+        run: |
+          STATUS=$(curl -s "https://oldenera-fansite.onrender.com/api/thumbnailsync/status")
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          PENDING_COUNT=$(echo "$STATUS" | jq -r '.totalPending')
+          echo "pending_count=$PENDING_COUNT" >> $GITHUB_OUTPUT
+          
+          if [ "$PENDING_COUNT" = "0" ]; then
+            echo "No pending thumbnails found"
+            echo "has_pending=false" >> $GITHUB_OUTPUT
+          else
+            echo "Found $PENDING_COUNT pending thumbnails"
+            echo "has_pending=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 📦 Download Pending Thumbnails
+        if: steps.status.outputs.has_pending == 'true'
+        run: |
+          echo "Downloading pending thumbnails..."
+          curl -L "https://oldenera-fansite.onrender.com/api/thumbnailsync/download-pending" \
+               --output thumbnails.zip
+          
+          # Extract to frontend directory structure
+          mkdir -p frontend/public/images/screenshots/thumbnails
+          mkdir -p frontend/public/images/screenshots/large
+          
+          unzip -j thumbnails.zip "thumbnails/*" -d frontend/public/images/screenshots/thumbnails/
+          unzip -j thumbnails.zip "large/*" -d frontend/public/images/screenshots/large/
+          
+          rm thumbnails.zip
+          
+          # Count extracted files
+          THUMB_COUNT=$(find frontend/public/images/screenshots/thumbnails/ -name "*.webp" -o -name "*.jpg" | wc -l)
+          LARGE_COUNT=$(find frontend/public/images/screenshots/large/ -name "*.webp" -o -name "*.jpg" | wc -l)
+          TOTAL_COUNT=$((THUMB_COUNT + LARGE_COUNT))
+          
+          echo "Extracted $TOTAL_COUNT files ($THUMB_COUNT thumbnails, $LARGE_COUNT large)"
+          echo "extracted_count=$TOTAL_COUNT" >> $GITHUB_ENV
+
+      - name: 📝 Commit and Push Changes
+        if: steps.status.outputs.has_pending == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Actions"
+          
+          # Add all new thumbnail files
+          git add frontend/public/images/screenshots/thumbnails/
+          git add frontend/public/images/screenshots/large/
+          
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🖼️ Auto-sync ${{ env.extracted_count }} generated thumbnails
+
+            - WebP and JPEG thumbnails for optimized loading
+            - Generated via backend image processing
+            - Batch sync from temporary storage
+            
+            🤖 Generated with [Claude Code](https://claude.ai/code)"
+            
+            git push
+            echo "Changes committed and pushed successfully"
+          fi
+
+      - name: 🧹 Mark Thumbnails as Synced
+        if: steps.status.outputs.has_pending == 'true'
+        run: |
+          echo "Marking thumbnails as synced on backend..."
+          RESPONSE=$(curl -X POST "https://oldenera-fansite.onrender.com/api/thumbnailsync/mark-synced")
+          echo "Backend response: $RESPONSE"
+
+      - name: 📊 Summary
+        run: |
+          if [ "${{ steps.status.outputs.has_pending }}" = "true" ]; then
+            echo "✅ Successfully synced ${{ env.extracted_count }} thumbnails"
+            echo "🚀 Thumbnails now available via Vercel CDN"
+          else
+            echo "ℹ️ No pending thumbnails found - nothing to sync"
+          fi

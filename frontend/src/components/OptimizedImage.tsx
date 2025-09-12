@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface OptimizedImageProps {
   webpSrc?: string;
@@ -14,6 +14,7 @@ interface OptimizedImageProps {
 
 /**
  * OptimizedImage component that serves WebP with JPEG fallback
+ * Falls back to original image if thumbnails aren't generated yet
  * Uses <picture> element for automatic format selection by browser
  */
 const OptimizedImage: React.FC<OptimizedImageProps> = ({
@@ -27,8 +28,11 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   height,
   onClick
 }) => {
-  // If no optimized sources provided, use regular img
-  if (!webpSrc && !jpegSrc) {
+  const [webpFailed, setWebpFailed] = useState(false);
+  const [jpegFailed, setJpegFailed] = useState(false);
+
+  // If no optimized sources provided or both failed, use original image
+  if ((!webpSrc && !jpegSrc) || (webpFailed && jpegFailed)) {
     return (
       <img
         src={fallbackSrc}
@@ -44,23 +48,31 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
 
   return (
     <picture onClick={onClick}>
-      {/* WebP source - preferred format */}
-      {webpSrc && (
+      {/* WebP source - preferred format, fallback to original if not yet generated */}
+      {webpSrc && !webpFailed && (
         <source 
           srcSet={webpSrc} 
-          type="image/webp" 
+          type="image/webp"
+          onError={() => {
+            console.log(`WebP thumbnail not yet available: ${webpSrc}, using original`);
+            setWebpFailed(true);
+          }}
         />
       )}
       
-      {/* JPEG source - fallback for older browsers */}
-      {jpegSrc && (
+      {/* JPEG source - fallback for older browsers or if WebP failed */}
+      {jpegSrc && !jpegFailed && (
         <source 
           srcSet={jpegSrc} 
-          type="image/jpeg" 
+          type="image/jpeg"
+          onError={() => {
+            console.log(`JPEG thumbnail not yet available: ${jpegSrc}, using original`);
+            setJpegFailed(true);
+          }}
         />
       )}
       
-      {/* Final fallback img element */}
+      {/* Final fallback to original image */}
       <img
         src={jpegSrc || fallbackSrc}
         alt={alt}

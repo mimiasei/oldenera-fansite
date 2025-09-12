@@ -80,6 +80,24 @@ oldenerafansite/
 - Automatic database initialization with sample data
 - Docker volume for persistent data storage
 
+## Environment Variables
+
+### Required for Production
+- `DATABASE_URL` - PostgreSQL connection string
+- `JWT_SECRET_KEY` - JWT signing key (minimum 32 characters)
+- `JWT_ISSUER` - JWT token issuer
+- `JWT_AUDIENCE` - JWT token audience
+
+### Required for GitHub Actions Thumbnail Sync
+- `GITHUB_TOKEN` - GitHub personal access token with repo permissions
+- `GITHUB_REPO_OWNER` - GitHub repository owner/organization name
+- `GITHUB_REPO_NAME` - GitHub repository name
+
+### Optional Configuration
+- `ASPNETCORE_ENVIRONMENT` - Environment setting (Development/Production)
+
+The thumbnail sync system uses these GitHub environment variables to trigger automated deployment of generated thumbnails via GitHub Actions. The backend's ThumbnailBatchSyncService checks for pending thumbnails every 60 minutes and triggers the sync workflow automatically.
+
 ## Notes
 - This is an unofficial fan site
 - All game assets and trademarks belong to their respective owners
@@ -98,3 +116,4 @@ oldenerafansite/
 - **TEST** migrations on fresh database: `dotnet ef database drop --force && dotnet ef database update`
 - **REVIEW** MIGRATION_BEST_PRACTICES.md for detailed schema validation procedures
 - always execute this workflow before creating/updating anything involving db
+- do not automatically commit to git, but recommend/suggest it to me

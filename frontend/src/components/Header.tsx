@@ -27,12 +27,12 @@ const Header = () => {
   }, [isMobileMenuOpen]);
 
   return (
-    <header className="fantasy-gradient-unfrozen text-white shadow-lg">
+    <header className="sticky left-0 top-0 right-0 z-10 fantasy-gradient-unfrozen text-white shadow-[0_10px_15px_rgba(0,0,0,0.5)]">
       <div className="container mx-auto px-4 py-2">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between">
           <Link to="/" className="font-bold font-fantasy">
-              <div className="text-3xl">Olden Wiki</div>
-              <div className="text-xs ml-4">A Heroes of Might and Magic: Olden Era Fan Site</div>
+              <div className="text-2xl">Olden Wiki</div>
+              <div className="text-[10px] ml-4">A Heroes of Might and Magic: Olden Era Fan Site</div>
           </Link>
           
           <div className="flex items-center space-x-6">
@@ -45,8 +45,8 @@ const Header = () => {
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:block font-fantasy">
-              <ul className="flex space-x-6">
+            <nav className="hidden lg:block font-fantasy font-bold">
+              <ul className="flex space-x-4">
                 <li>
                   <Link 
                     to="/" 

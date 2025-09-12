@@ -203,6 +203,9 @@ storybook-static
 tmp/
 temp/
 
+# Temporary thumbnail storage (excluded from version control)
+backend/wwwroot/temp/
+
 # OS generated files
 .DS_Store
 .DS_Store?
