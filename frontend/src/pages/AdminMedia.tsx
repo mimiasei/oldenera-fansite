@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMediaItems, useMediaCategories } from '../hooks/useSWR';
-import { mediaApi, MediaFiltersParams } from '../services/api';
+import { mediaApi, MediaFiltersParams, adminApi, RegenerateThumbnailsRequest } from '../services/api';
 import { MediaItem } from '../types';
 
 const AdminMedia: React.FC = () => {
@@ -11,6 +11,8 @@ const AdminMedia: React.FC = () => {
   });
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [regeneratingThumbnails, setRegeneratingThumbnails] = useState(false);
+  const [thumbnailResults, setThumbnailResults] = useState<any[]>([]);
 
   const { mediaItems, isLoading, isError, refetch } = useMediaItems(filters);
   const { categories } = useMediaCategories();
@@ -45,6 +47,35 @@ const AdminMedia: React.FC = () => {
       alert('Failed to update approval status. Please try again.');
     } finally {
       setUpdatingId(null);
+    }
+  };
+
+  const handleRegenerateThumbnails = async (force: boolean = false) => {
+    const confirmed = confirm(
+      force 
+        ? 'This will regenerate ALL thumbnails, even existing ones. This may take several minutes. Continue?'
+        : 'This will generate thumbnails for media items that are missing WebP thumbnails. Continue?'
+    );
+    
+    if (!confirmed) return;
+
+    setRegeneratingThumbnails(true);
+    setThumbnailResults([]);
+    
+    try {
+      const request: RegenerateThumbnailsRequest = { force };
+      const response = await adminApi.regenerateThumbnails(request);
+      
+      setThumbnailResults(response.data.results || []);
+      refetch(); // Refresh media items to show new thumbnails
+      
+      alert(response.data.message);
+    } catch (error: any) {
+      console.error('Failed to regenerate thumbnails:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to regenerate thumbnails';
+      alert(`Error: ${errorMessage}`);
+    } finally {
+      setRegeneratingThumbnails(false);
     }
   };
 
@@ -96,12 +127,34 @@ const AdminMedia: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900">Media Management</h1>
           <p className="text-gray-600 mt-2">Manage screenshots, concept art, and other media content</p>
         </div>
-        <button className="btn btn-primary">
-          <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Upload Media
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => handleRegenerateThumbnails(false)}
+            disabled={regeneratingThumbnails}
+            className="btn btn-secondary"
+          >
+            <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            {regeneratingThumbnails ? 'Generating...' : 'Generate WebP Thumbnails'}
+          </button>
+          <button 
+            onClick={() => handleRegenerateThumbnails(true)}
+            disabled={regeneratingThumbnails}
+            className="btn btn-secondary"
+          >
+            <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            {regeneratingThumbnails ? 'Regenerating...' : 'Force Regenerate All'}
+          </button>
+          <button className="btn btn-primary">
+            <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Upload Media
+          </button>
+        </div>
       </div>
 
       {/* Filters */}

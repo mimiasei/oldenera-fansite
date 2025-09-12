@@ -12,6 +12,24 @@ import {
   MediaFilters
 } from '../types';
 
+// Admin API types
+export interface RegenerateThumbnailsRequest {
+  force?: boolean;
+  mediaItemId?: number;
+}
+
+export interface RegenerateThumbnailsResponse {
+  message: string;
+  processed: number;
+  errors: number;
+  results: Array<{
+    id: number;
+    title: string;
+    status: 'success' | 'error';
+    message: string;
+  }>;
+}
+
 // Smart environment detection
 const getApiBaseUrl = () => {
   // If VITE_API_URL is explicitly set, use it
@@ -351,6 +369,33 @@ export const mediaApi = {
   // Media Filters
   getFilters: () => 
     api.get<MediaFilters>('/media/filters'),
+};
+
+// Admin API
+export const adminApi = {
+  // Dashboard Stats
+  getDashboardStats: () => api.get('/admin/dashboard/stats'),
+  
+  // User Management
+  getUsers: (params?: { page?: number; pageSize?: number; search?: string; role?: string }) => {
+    const urlParams = new URLSearchParams();
+    if (params?.page) urlParams.append('page', params.page.toString());
+    if (params?.pageSize) urlParams.append('pageSize', params.pageSize.toString());
+    if (params?.search) urlParams.append('search', params.search);
+    if (params?.role) urlParams.append('role', params.role);
+    
+    return api.get(`/admin/users?${urlParams.toString()}`);
+  },
+  
+  updateUserStatus: (userId: string, isActive: boolean) =>
+    api.put(`/admin/users/${userId}/status`, { isActive }),
+  
+  updateUserRoles: (userId: string, roles: string[]) =>
+    api.put(`/admin/users/${userId}/roles`, { roles }),
+
+  // Thumbnail Regeneration
+  regenerateThumbnails: (request: RegenerateThumbnailsRequest) =>
+    api.post<RegenerateThumbnailsResponse>('/admin/regenerate-thumbnails', request),
 };
 
 // SWR fetcher function

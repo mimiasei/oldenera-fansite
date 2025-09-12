@@ -37,7 +37,10 @@ artifacts/
 *.pidb
 *.svclog
 *.scc
-*.png
+# *.png  # Commented out to allow media files
+# Ignore PNG files in specific directories but allow media files
+temp/*.png
+tmp/*.png
 
 # .NET Core
 project.lock.json

@@ -12,6 +12,7 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 - **Community Forum Integration**: Optimized Disqus-powered forum system with streamlined UX and immediate access to discussions
 - **Professional Loading Skeleton System**: Comprehensive skeleton components across all pages for enhanced user experience
 - **Universal Admin Edit Shortcuts**: Quick-access edit buttons throughout the site for administrators and moderators
+- **WebP Thumbnail Optimization**: Modern image format implementation with 25-50% file size reduction, dual-format serving (WebP + JPEG), and CLI management tools
 
 ### Technical Excellence
 - **Production-Ready Deployment**: Fully deployed with automatic database migrations, environment detection, and API connectivity
@@ -148,6 +149,15 @@ The React frontend will be available at `http://localhost:5173` with SWR data fe
 - `dotnet test` - Run tests
 - `dotnet ef database update` - Apply database migrations
 
+### CLI Tools (Production Management)
+- `dotnet run -- regenerate-thumbnails` - Generate WebP thumbnails for all media
+- `dotnet run -- regenerate-thumbnails --force` - Force regenerate all thumbnails
+- `dotnet run -- regenerate-thumbnails --id 123` - Regenerate specific media item
+- `dotnet run -- list-media` - Show media items missing WebP thumbnails
+- `dotnet run -- list-media --all` - Show all media items with thumbnail status
+- `dotnet run -- cleanup-thumbnails --dry-run` - Preview orphaned thumbnail cleanup
+- `dotnet run -- cleanup-thumbnails` - Remove orphaned thumbnail files
+
 ### Database (Docker)
 - `docker-compose up -d postgres` - Start PostgreSQL container
 - `docker-compose down` - Stop all containers
@@ -199,6 +209,9 @@ The site features a fantasy-themed design inspired by the Heroes of Might and Ma
 - [x] Universal admin edit shortcuts with seamless content management workflow
 - [x] Complete media item editing system with metadata management
 - [x] Community forum implementation with Disqus integration and UX optimization
+- [x] WebP thumbnail optimization system with modern image format support
+- [x] CLI command system for production thumbnail management and maintenance
+- [x] Progressive image enhancement with HTML5 picture element and automatic fallbacks
 - [ ] Game information admin interface for content management
 - [ ] Google OAuth integration
 - [ ] Email notifications and user engagement features

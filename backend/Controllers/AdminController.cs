@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OldenEraFanSite.Api.Data;
 using OldenEraFanSite.Api.Models;
+using OldenEraFanSite.Api.Services;
 
 namespace OldenEraFanSite.Api.Controllers;
 
@@ -15,15 +16,18 @@ public class AdminController : ControllerBase
     private readonly ApplicationDbContext _context;
     private readonly UserManager<User> _userManager;
     private readonly ILogger<AdminController> _logger;
+    private readonly IImageProcessingService _imageProcessingService;
 
     public AdminController(
         ApplicationDbContext context,
         UserManager<User> userManager,
-        ILogger<AdminController> logger)
+        ILogger<AdminController> logger,
+        IImageProcessingService imageProcessingService)
     {
         _context = context;
         _userManager = userManager;
         _logger = logger;
+        _imageProcessingService = imageProcessingService;
     }
 
     [HttpGet("dashboard/stats")]
@@ -257,6 +261,120 @@ public class AdminController : ControllerBase
             return StatusCode(500, new { message = "Failed to update user roles" });
         }
     }
+
+    [HttpPost("regenerate-thumbnails")]
+    [Authorize(Policy = "ModeratorOrAdmin")]
+    public async Task<IActionResult> RegenerateThumbnails([FromBody] RegenerateThumbnailsRequest request)
+    {
+        try
+        {
+            _logger.LogInformation("Starting thumbnail regeneration via API. Force: {Force}, Specific ID: {Id}", 
+                request.Force, request.MediaItemId);
+
+            var query = _context.MediaItems.AsQueryable();
+
+            // Filter by specific media item if requested
+            if (request.MediaItemId.HasValue)
+            {
+                query = query.Where(m => m.Id == request.MediaItemId.Value);
+            }
+            else if (!request.Force)
+            {
+                // Only process items missing WebP thumbnails
+                query = query.Where(m => string.IsNullOrEmpty(m.ThumbnailWebpUrl) || string.IsNullOrEmpty(m.LargeWebpUrl));
+            }
+
+            var mediaItems = await query.ToListAsync();
+
+            if (!mediaItems.Any())
+            {
+                return Ok(new { 
+                    message = request.Force ? "No media items found" : "All media items already have WebP thumbnails",
+                    processed = 0,
+                    errors = 0
+                });
+            }
+
+            var processed = 0;
+            var errors = 0;
+            var results = new List<object>();
+
+            foreach (var item in mediaItems)
+            {
+                try
+                {
+                    _logger.LogInformation("Processing media item {Id}: {Title}", item.Id, item.Title);
+
+                    // Download the original file from Vercel URL
+                    using var httpClient = new HttpClient();
+                    var originalUrl = $"https://oldenwiki.com{item.OriginalUrl}";
+                    
+                    _logger.LogInformation("Downloading from: {Url}", originalUrl);
+                    
+                    var response = await httpClient.GetAsync(originalUrl);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        _logger.LogWarning("Failed to download {Url}: {StatusCode}", originalUrl, response.StatusCode);
+                        errors++;
+                        results.Add(new { 
+                            id = item.Id, 
+                            title = item.Title, 
+                            status = "error", 
+                            message = $"Failed to download original file: {response.StatusCode}" 
+                        });
+                        continue;
+                    }
+
+                    using var stream = await response.Content.ReadAsStreamAsync();
+                    var result = await _imageProcessingService.ProcessImageAsync(stream, Path.GetFileNameWithoutExtension(item.OriginalUrl));
+
+                    // Update database with new thumbnail URLs
+                    item.ThumbnailUrl = result.ThumbnailJpegUrl;
+                    item.ThumbnailWebpUrl = result.ThumbnailWebpUrl;
+                    item.LargeUrl = result.LargeJpegUrl;
+                    item.LargeWebpUrl = result.LargeWebpUrl;
+
+                    processed++;
+                    results.Add(new { 
+                        id = item.Id, 
+                        title = item.Title, 
+                        status = "success", 
+                        message = "Thumbnails generated successfully" 
+                    });
+
+                    _logger.LogInformation("Successfully processed media item {Id}", item.Id);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to process media item {Id}: {Title}", item.Id, item.Title);
+                    errors++;
+                    results.Add(new { 
+                        id = item.Id, 
+                        title = item.Title, 
+                        status = "error", 
+                        message = ex.Message 
+                    });
+                }
+            }
+
+            // Save all changes
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Thumbnail regeneration completed. Processed: {Processed}, Errors: {Errors}", processed, errors);
+
+            return Ok(new {
+                message = $"Thumbnail regeneration completed. Processed: {processed}, Errors: {errors}",
+                processed,
+                errors,
+                results
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to regenerate thumbnails");
+            return StatusCode(500, new { message = "Failed to regenerate thumbnails", error = ex.Message });
+        }
+    }
 }
 
 public class UpdateUserStatusRequest
@@ -267,4 +385,10 @@ public class UpdateUserStatusRequest
 public class UpdateUserRolesRequest
 {
     public string[] Roles { get; set; } = Array.Empty<string>();
+}
+
+public class RegenerateThumbnailsRequest
+{
+    public bool Force { get; set; } = false;
+    public int? MediaItemId { get; set; }
 }
