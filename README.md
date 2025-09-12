@@ -13,6 +13,7 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 - **Professional Loading Skeleton System**: Comprehensive skeleton components across all pages for enhanced user experience
 - **Universal Admin Edit Shortcuts**: Quick-access edit buttons throughout the site for administrators and moderators
 - **WebP Thumbnail Optimization**: Modern image format implementation with 25-50% file size reduction, dual-format serving (WebP + JPEG), and CLI management tools
+- **Hybrid Batch Thumbnail Processing**: Intelligent 60-minute batch sync system with manual admin triggers, GitHub Actions deployment, and cost-optimized architecture
 
 ### Technical Excellence
 - **Production-Ready Deployment**: Fully deployed with automatic database migrations, environment detection, and API connectivity
@@ -158,6 +159,12 @@ The React frontend will be available at `http://localhost:5173` with SWR data fe
 - `dotnet run -- cleanup-thumbnails --dry-run` - Preview orphaned thumbnail cleanup
 - `dotnet run -- cleanup-thumbnails` - Remove orphaned thumbnail files
 
+### Admin Dashboard Features
+- **Manual Thumbnail Sync**: Admin dashboard includes "Sync Thumbnails" button for immediate GitHub Actions deployment
+- **Intelligent Batch Processing**: Background service processes thumbnails every 60 minutes with manual trigger support
+- **Sync Status Monitoring**: Real-time feedback on pending thumbnails, sync success, and next scheduled sync
+- **Timer Reset Logic**: Manual triggers reset the 60-minute auto-sync timer for optimal cost efficiency
+
 ### Database (Docker)
 - `docker-compose up -d postgres` - Start PostgreSQL container
 - `docker-compose down` - Stop all containers
@@ -212,6 +219,9 @@ The site features a fantasy-themed design inspired by the Heroes of Might and Ma
 - [x] WebP thumbnail optimization system with modern image format support
 - [x] CLI command system for production thumbnail management and maintenance
 - [x] Progressive image enhancement with HTML5 picture element and automatic fallbacks
+- [x] Hybrid batch processing system with 60-minute intervals and manual admin triggers
+- [x] GitHub Actions integration for automated thumbnail deployment with cost optimization
+- [x] Intelligent sync scheduling with timer reset logic and comprehensive admin controls
 - [ ] Game information admin interface for content management
 - [ ] Google OAuth integration
 - [ ] Email notifications and user engagement features

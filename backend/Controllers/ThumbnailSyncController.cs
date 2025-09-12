@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.IO.Compression;
+using OldenEraFanSite.Api.Services;
 
 namespace OldenEraFanSite.Api.Controllers;
 
@@ -10,13 +11,16 @@ public class ThumbnailSyncController : ControllerBase
 {
     private readonly IWebHostEnvironment _environment;
     private readonly ILogger<ThumbnailSyncController> _logger;
+    private readonly IConfiguration _configuration;
 
     public ThumbnailSyncController(
         IWebHostEnvironment environment,
-        ILogger<ThumbnailSyncController> logger)
+        ILogger<ThumbnailSyncController> logger,
+        IConfiguration configuration)
     {
         _environment = environment;
         _logger = logger;
+        _configuration = configuration;
     }
 
     [HttpGet("download-pending")]
@@ -153,5 +157,94 @@ public class ThumbnailSyncController : ControllerBase
             _logger.LogError(ex, "❌ Failed to get sync status");
             return StatusCode(500, new { message = "Failed to get sync status" });
         }
+    }
+
+    [HttpPost("trigger-manual")]
+    [Authorize(Policy = "AdminOnly")]
+    public async Task<IActionResult> TriggerManualSync()
+    {
+        try
+        {
+            var tempThumbnailsDir = Path.Combine(_environment.WebRootPath, "temp", "thumbnails");
+            var tempLargeDir = Path.Combine(_environment.WebRootPath, "temp", "large");
+
+            // Check if there are pending thumbnails to sync
+            var hasPendingThumbnails = (Directory.Exists(tempThumbnailsDir) && Directory.GetFiles(tempThumbnailsDir).Any()) ||
+                                      (Directory.Exists(tempLargeDir) && Directory.GetFiles(tempLargeDir).Any());
+
+            if (!hasPendingThumbnails)
+            {
+                return Ok(new { 
+                    message = "No pending thumbnails to sync",
+                    triggered = false,
+                    pendingCount = 0 
+                });
+            }
+
+            var thumbnailCount = 0;
+            if (Directory.Exists(tempThumbnailsDir))
+                thumbnailCount += Directory.GetFiles(tempThumbnailsDir).Length;
+            if (Directory.Exists(tempLargeDir))
+                thumbnailCount += Directory.GetFiles(tempLargeDir).Length;
+
+            // Trigger GitHub Action sync immediately
+            await TriggerGitHubActionSync();
+            
+            // Notify the background service about the manual trigger
+            ThumbnailBatchSyncService.NotifyManualTrigger();
+
+            _logger.LogInformation("🚀 Manual thumbnail sync triggered by admin for {Count} thumbnails", thumbnailCount);
+
+            return Ok(new { 
+                message = $"Manual sync triggered successfully for {thumbnailCount} thumbnails",
+                triggered = true,
+                pendingCount = thumbnailCount,
+                nextAutoSync = DateTimeOffset.UtcNow.AddMinutes(60)
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "❌ Failed to trigger manual sync");
+            return StatusCode(500, new { message = "Failed to trigger manual sync" });
+        }
+    }
+
+    private async Task TriggerGitHubActionSync()
+    {
+        var gitHubToken = _configuration["GITHUB_TOKEN"] ?? Environment.GetEnvironmentVariable("GITHUB_TOKEN");
+        var repoOwner = _configuration["GITHUB_REPO_OWNER"] ?? Environment.GetEnvironmentVariable("GITHUB_REPO_OWNER");
+        var repoName = _configuration["GITHUB_REPO_NAME"] ?? Environment.GetEnvironmentVariable("GITHUB_REPO_NAME");
+
+        if (string.IsNullOrEmpty(gitHubToken) || string.IsNullOrEmpty(repoOwner) || string.IsNullOrEmpty(repoName))
+        {
+            throw new InvalidOperationException("GitHub configuration missing for manual sync trigger");
+        }
+
+        using var httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {gitHubToken}");
+        httpClient.DefaultRequestHeaders.Add("User-Agent", "OldenEra-ThumbnailSync");
+
+        var payload = new
+        {
+            event_type = "sync-thumbnails",
+            client_payload = new
+            {
+                timestamp = DateTimeOffset.UtcNow.ToString("O"),
+                source = "manual-admin-trigger"
+            }
+        };
+
+        var response = await httpClient.PostAsJsonAsync(
+            $"https://api.github.com/repos/{repoOwner}/{repoName}/dispatches",
+            payload
+        );
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException($"GitHub API request failed: {response.StatusCode} - {errorContent}");
+        }
+
+        _logger.LogInformation("🚀 Manual GitHub repository dispatch sent successfully");
     }
 }

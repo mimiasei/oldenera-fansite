@@ -1,5 +1,19 @@
 # Changes Log
 
+## 2024-12-09
+
+### Manual Thumbnail Sync Administration
+- **Added manual thumbnail sync trigger API** - `/api/thumbnailsync/trigger-manual` endpoint for admin-initiated batch processing
+- **Implemented admin dashboard sync button** - Quick Actions section now includes "Sync Thumbnails" with loading states and feedback
+- **Enhanced ThumbnailBatchSyncService timer logic** - Background service now resets 60-minute timer after manual triggers
+- **Added intelligent sync scheduling** - Prevents duplicate syncs and ensures 60-minute intervals from manual triggers
+- **Improved sync status reporting** - Detailed feedback on pending thumbnails, sync success, and next scheduled sync
+- **Updated .gitignore** - Added `backend/wwwroot/temp/` exclusion for temporary thumbnail storage
+- **Documented GitHub environment variables** - Added comprehensive environment variable documentation to CLAUDE.md
+
+### Brief Summary
+Completed manual thumbnail sync administration feature allowing admins to immediately trigger GitHub Actions deployment while maintaining efficient 60-minute batch processing intervals. System provides immediate control while preserving cost optimization through intelligent timer management.
+
 ## 2024-09-09
 
 ### Production Deployment & Environment Configuration

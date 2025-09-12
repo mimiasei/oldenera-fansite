@@ -8,6 +8,16 @@ public class ThumbnailBatchSyncService : BackgroundService
     private readonly ILogger<ThumbnailBatchSyncService> _logger;
     private readonly IWebHostEnvironment _environment;
     private readonly IConfiguration _configuration;
+    private static readonly object _lockObject = new object();
+    private static DateTime _lastManualTrigger = DateTime.MinValue;
+    
+    public static void NotifyManualTrigger()
+    {
+        lock (_lockObject)
+        {
+            _lastManualTrigger = DateTime.UtcNow;
+        }
+    }
 
     public ThumbnailBatchSyncService(
         IServiceProvider serviceProvider,
@@ -24,15 +34,45 @@ public class ThumbnailBatchSyncService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("🔄 Thumbnail Batch Sync Service started - checking every 60 minutes");
+        var lastAutoSync = DateTime.UtcNow;
 
         while (!stoppingToken.IsCancellationRequested)
         {
             try
             {
-                await CheckAndSyncThumbnails();
+                DateTime lastManualTriggerCopy;
+                lock (_lockObject)
+                {
+                    lastManualTriggerCopy = _lastManualTrigger;
+                }
+
+                // Check if manual sync happened since our last check
+                var shouldSkipThisRound = lastManualTriggerCopy > lastAutoSync;
+
+                if (!shouldSkipThisRound)
+                {
+                    await CheckAndSyncThumbnails();
+                }
+                else
+                {
+                    _logger.LogInformation("⏭️ Skipping auto sync - manual sync triggered recently");
+                }
+
+                lastAutoSync = DateTime.UtcNow;
                 
-                // Wait 60 minutes before next check
-                await Task.Delay(TimeSpan.FromMinutes(60), stoppingToken);
+                // Calculate next sync time: 60 minutes from now, or 60 minutes from last manual trigger if recent
+                var nextSyncTime = DateTime.UtcNow.AddMinutes(60);
+                if (lastManualTriggerCopy > DateTime.UtcNow.AddMinutes(-60))
+                {
+                    nextSyncTime = lastManualTriggerCopy.AddMinutes(60);
+                    _logger.LogInformation("⏰ Next auto sync scheduled for {NextSync} (60 min from manual trigger)", nextSyncTime);
+                }
+
+                var waitTime = nextSyncTime - DateTime.UtcNow;
+                if (waitTime > TimeSpan.Zero)
+                {
+                    await Task.Delay(waitTime, stoppingToken);
+                }
             }
             catch (OperationCanceledException)
             {

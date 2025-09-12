@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import useSWR from 'swr';
 import { useAuth } from '../contexts/AuthContext';
@@ -40,6 +40,38 @@ interface DashboardStats {
 const AdminDashboard: React.FC = () => {
   const { user } = useAuth();
   const { data: stats, error, isLoading } = useSWR<DashboardStats>('/admin/dashboard/stats', fetcher);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncMessage, setSyncMessage] = useState<string | null>(null);
+
+  const handleManualSync = async () => {
+    setIsSyncing(true);
+    setSyncMessage(null);
+    
+    try {
+      const response = await fetch('/api/thumbnailsync/trigger-manual', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result = await response.json();
+      
+      if (response.ok) {
+        setSyncMessage(result.message);
+        if (result.triggered) {
+          setTimeout(() => setSyncMessage(null), 5000);
+        }
+      } else {
+        setSyncMessage(result.message || 'Failed to trigger sync');
+      }
+    } catch (error) {
+      setSyncMessage('Failed to connect to server');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -191,7 +223,15 @@ const AdminDashboard: React.FC = () => {
       {/* Quick Actions */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+        {/* Sync Message */}
+        {syncMessage && (
+          <div className="mb-4 p-3 rounded-lg bg-blue-50 border border-blue-200">
+            <p className="text-sm text-blue-800">{syncMessage}</p>
+          </div>
+        )}
+        
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Link
             to="/admin/news/create"
             className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
@@ -230,6 +270,24 @@ const AdminDashboard: React.FC = () => {
               <p className="text-sm text-gray-500">Edit existing articles</p>
             </div>
           </Link>
+
+          <button
+            onClick={handleManualSync}
+            disabled={isSyncing}
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg className="h-8 w-8 text-orange-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            <div>
+              <h3 className="font-medium text-gray-900">
+                {isSyncing ? 'Syncing...' : 'Sync Thumbnails'}
+              </h3>
+              <p className="text-sm text-gray-500">
+                {isSyncing ? 'Triggering sync...' : 'Manual thumbnail sync'}
+              </p>
+            </div>
+          </button>
         </div>
       </div>
 
