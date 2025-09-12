@@ -19,16 +19,35 @@ jobs:
       - name: 📊 Check Sync Status
         id: status
         run: |
+          echo "Checking sync status..."
           STATUS=$(curl -s "https://oldenera-fansite.onrender.com/api/thumbnailsync/status")
-          echo "status=$STATUS" >> $GITHUB_OUTPUT
-          PENDING_COUNT=$(echo "$STATUS" | jq -r '.totalPending')
-          echo "pending_count=$PENDING_COUNT" >> $GITHUB_OUTPUT
+          echo "Raw API response:"
+          echo "$STATUS"
+          echo ""
           
-          if [ "$PENDING_COUNT" = "0" ]; then
+          # Validate JSON first
+          if ! echo "$STATUS" | jq empty 2>/dev/null; then
+            echo "❌ Invalid JSON response from API"
+            echo "Response was: $STATUS"
+            exit 1
+          fi
+          
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          
+          # Parse with error handling and fallback to 0
+          PENDING_COUNT=$(echo "$STATUS" | jq -r '.totalPending // 0')
+          PENDING_THUMBNAILS=$(echo "$STATUS" | jq -r '.pendingThumbnails // 0')
+          PENDING_LARGE=$(echo "$STATUS" | jq -r '.pendingLarge // 0')
+          
+          echo "pending_count=$PENDING_COUNT" >> $GITHUB_OUTPUT
+          echo "pending_thumbnails=$PENDING_THUMBNAILS" >> $GITHUB_OUTPUT
+          echo "pending_large=$PENDING_LARGE" >> $GITHUB_OUTPUT
+          
+          if [ "$PENDING_COUNT" = "0" ] || [ "$PENDING_COUNT" = "null" ]; then
             echo "No pending thumbnails found"
             echo "has_pending=false" >> $GITHUB_OUTPUT
           else
-            echo "Found $PENDING_COUNT pending thumbnails"
+            echo "Found $PENDING_COUNT pending thumbnails ($PENDING_THUMBNAILS thumbnails + $PENDING_LARGE large)"
             echo "has_pending=true" >> $GITHUB_OUTPUT
           fi
 
@@ -36,21 +55,39 @@ jobs:
         if: steps.status.outputs.has_pending == 'true'
         run: |
           echo "Downloading pending thumbnails..."
-          curl -L "https://oldenera-fansite.onrender.com/api/thumbnailsync/download-pending" \
-               --output thumbnails.zip
+          
+          # Download with better error handling
+          if ! curl -L --fail "https://oldenera-fansite.onrender.com/api/thumbnailsync/download-pending" --output thumbnails.zip; then
+            echo "❌ Failed to download thumbnails"
+            exit 1
+          fi
+          
+          # Verify zip file
+          if [ ! -f thumbnails.zip ] || [ ! -s thumbnails.zip ]; then
+            echo "❌ Downloaded file is empty or missing"
+            exit 1
+          fi
+          
+          echo "Downloaded $(du -h thumbnails.zip | cut -f1) zip file"
           
           # Extract to frontend directory structure
           mkdir -p frontend/public/images/screenshots/thumbnails
           mkdir -p frontend/public/images/screenshots/large
           
-          unzip -j thumbnails.zip "thumbnails/*" -d frontend/public/images/screenshots/thumbnails/
-          unzip -j thumbnails.zip "large/*" -d frontend/public/images/screenshots/large/
+          # Extract with error handling
+          if ! unzip -j thumbnails.zip "thumbnails/*" -d frontend/public/images/screenshots/thumbnails/ 2>/dev/null; then
+            echo "⚠️ No thumbnails/ directory in zip or extraction failed"
+          fi
+          
+          if ! unzip -j thumbnails.zip "large/*" -d frontend/public/images/screenshots/large/ 2>/dev/null; then
+            echo "⚠️ No large/ directory in zip or extraction failed"
+          fi
           
           rm thumbnails.zip
           
           # Count extracted files
-          THUMB_COUNT=$(find frontend/public/images/screenshots/thumbnails/ -name "*.webp" -o -name "*.jpg" | wc -l)
-          LARGE_COUNT=$(find frontend/public/images/screenshots/large/ -name "*.webp" -o -name "*.jpg" | wc -l)
+          THUMB_COUNT=$(find frontend/public/images/screenshots/thumbnails/ -name "*.webp" -o -name "*.jpg" 2>/dev/null | wc -l)
+          LARGE_COUNT=$(find frontend/public/images/screenshots/large/ -name "*.webp" -o -name "*.jpg" 2>/dev/null | wc -l)
           TOTAL_COUNT=$((THUMB_COUNT + LARGE_COUNT))
           
           echo "Extracted $TOTAL_COUNT files ($THUMB_COUNT thumbnails, $LARGE_COUNT large)"
@@ -63,36 +100,38 @@ jobs:
           git config --local user.name "GitHub Actions"
           
           # Add all new thumbnail files
-          git add frontend/public/images/screenshots/thumbnails/
-          git add frontend/public/images/screenshots/large/
+          git add frontend/public/images/screenshots/thumbnails/ 2>/dev/null || true
+          git add frontend/public/images/screenshots/large/ 2>/dev/null || true
           
           # Check if there are changes to commit
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "🖼️ Auto-sync ${{ env.extracted_count }} generated thumbnails
-
-            - WebP and JPEG thumbnails for optimized loading
-            - Generated via backend image processing
-            - Batch sync from temporary storage
+            COMMIT_COUNT="${{ env.extracted_count }}"
+            [ -z "$COMMIT_COUNT" ] && COMMIT_COUNT="unknown"
             
-            🤖 Generated with [Claude Code](https://claude.ai/code)"
+            git commit -m "🖼️ Auto-sync $COMMIT_COUNT generated thumbnails
+            - WebP and JPEG thumbnails for optimized loading
+            - Generated via backend image processing  
+            - Batch sync from temporary storage"
             
             git push
-            echo "Changes committed and pushed successfully"
+            echo "✅ Changes committed and pushed successfully"
           fi
 
       - name: 🧹 Mark Thumbnails as Synced
         if: steps.status.outputs.has_pending == 'true'
         run: |
           echo "Marking thumbnails as synced on backend..."
-          RESPONSE=$(curl -X POST "https://oldenera-fansite.onrender.com/api/thumbnailsync/mark-synced")
-          echo "Backend response: $RESPONSE"
-
+          RESPONSE=$(curl -s -X POST "https://oldenera-fansite.onrender.com/api/thumbnailsync/mark-synced")
+          echo "Backend cleanup response: $RESPONSE"
+          
       - name: 📊 Summary
         run: |
           if [ "${{ steps.status.outputs.has_pending }}" = "true" ]; then
-            echo "✅ Successfully synced ${{ env.extracted_count }} thumbnails"
+            EXTRACTED_COUNT="${{ env.extracted_count }}"
+            [ -z "$EXTRACTED_COUNT" ] && EXTRACTED_COUNT="some"
+            echo "✅ Successfully synced $EXTRACTED_COUNT thumbnails"
             echo "🚀 Thumbnails now available via Vercel CDN"
           else
             echo "ℹ️ No pending thumbnails found - nothing to sync"
