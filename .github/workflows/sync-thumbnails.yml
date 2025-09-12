@@ -22,7 +22,10 @@ jobs:
           echo "Checking sync status..."
           RESPONSE=$(curl -s "https://oldenera-fansite.onrender.com/api/thumbnailsync/status")
           echo "API Response received"
-          echo "response=$RESPONSE" >> $GITHUB_OUTPUT
+          # Store JSON response using proper multiline format for GitHub Actions
+          echo "response<<EOF" >> $GITHUB_OUTPUT
+          echo "$RESPONSE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
           
       - name: 📊 Parse Status Response  
         id: status
