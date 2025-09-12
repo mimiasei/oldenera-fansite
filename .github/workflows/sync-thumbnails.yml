@@ -36,8 +36,8 @@ jobs:
             exit 1
           fi
           
-          # Store raw response for debugging
-          echo "status=$(cat /tmp/status.json)" >> $GITHUB_OUTPUT
+          # Note: Not storing raw JSON in output to avoid formatting issues
+          # The parsed values below are what we actually need
           
           # Extract values with more robust error handling
           PENDING_COUNT=$(jq -r '.totalPending // 0' /tmp/status.json 2>/dev/null || echo "0")
