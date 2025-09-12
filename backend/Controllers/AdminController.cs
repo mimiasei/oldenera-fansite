@@ -329,9 +329,9 @@ public class AdminController : ControllerBase
                     var result = await _imageProcessingService.ProcessImageAsync(stream, Path.GetFileNameWithoutExtension(item.OriginalUrl));
 
                     // Update database with new thumbnail URLs
-                    item.ThumbnailUrl = result.ThumbnailJpegUrl;
+                    item.ThumbnailUrl = result.ThumbnailUrl;
                     item.ThumbnailWebpUrl = result.ThumbnailWebpUrl;
-                    item.LargeUrl = result.LargeJpegUrl;
+                    item.LargeUrl = result.LargeUrl;
                     item.LargeWebpUrl = result.LargeWebpUrl;
 
                     processed++;
