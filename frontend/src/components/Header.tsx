@@ -27,7 +27,7 @@ const Header = () => {
   }, [isMobileMenuOpen]);
 
   return (
-    <header className="sticky left-0 top-0 right-0 z-10 fantasy-gradient-unfrozen text-white shadow-[0_10px_15px_rgba(0,0,0,0.5)]">
+    <header className="sticky left-0 top-0 right-0 z-20 fantasy-gradient-unfrozen text-white shadow-[0_10px_15px_rgba(0,0,0,0.5)]">
       <div className="container mx-auto px-4 py-2">
         <div className="flex items-center justify-between">
           <Link to="/" className="font-bold font-fantasy">
