@@ -1,5 +1,17 @@
 # Changes Log
 
+## 2025-09-14
+
+### Game Asset Management Validation & UX Improvements
+- **Fixed validation error display system** - Server validation errors now properly appear as red borders around invalid table cells with detailed hover tooltips
+- **Enhanced faction assignment logic** - New units and heroes automatically inherit `factionId` from the selected faction filter dropdown (no separate faction column needed)
+- **Improved error handling and debugging** - Added comprehensive console logging of request payloads and server responses for better debugging
+- **Expanded error parsing capabilities** - Enhanced validation error parsing to handle ASP.NET Core ModelState errors, string messages, problem details, and custom response formats
+- **Streamlined user experience** - Users select faction once via existing filter dropdown, then all new assets automatically get proper faction assignment
+
+### Brief Summary
+Resolved critical validation feedback issues in the game asset management system. Users now see clear visual indicators for validation errors directly on invalid table cells, and faction assignment works seamlessly through the existing faction filter dropdown without requiring additional table columns.
+
 ## 2025-09-12
 
 ### Complete Thumbnail Sync System Resolution

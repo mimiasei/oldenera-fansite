@@ -231,6 +231,8 @@ The site features a fantasy-themed design inspired by the Heroes of Might and Ma
 - [x] Responsive table design with intelligent column sizing and professional dropdown components
 - [x] Batch editing workflow with Save/Revert controls and local-only new asset creation
 - [x] Inline validation system replacing popup dialogs with hover tooltips and visual indicators
+- [x] Enhanced validation error display with red cell borders and detailed hover feedback
+- [x] Streamlined faction assignment using existing filter dropdown for automatic factionId population
 - [ ] Enhanced game asset filtering and search capabilities
 - [ ] Bulk import/export functionality for game assets
 - [ ] Google OAuth integration

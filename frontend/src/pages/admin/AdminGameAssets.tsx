@@ -294,7 +294,8 @@ const AdminGameAssets: React.FC = () => {
             }
           } catch (error: any) {
             console.error(`Failed to create ${selectedAssetType.slice(0, -1)}:`, error);
-            console.log('🔍 Full error response:', error.response?.data);
+            console.error('Request payload:', asset);
+            console.error('Full error response:', error.response?.data);
 
             // Handle validation errors
             if (error.response?.status === 400 && error.response?.data) {
@@ -323,6 +324,9 @@ const AdminGameAssets: React.FC = () => {
                 if (errorData.includes('Biography') && errorData.includes('required')) {
                   assetErrors['biography'] = 'Biography is required';
                 }
+                if (errorData.includes('FactionId') || errorData.includes('faction')) {
+                  assetErrors['factionid'] = 'Faction is required';
+                }
               }
               // Handle validation problem details format
               else if (errorData.detail || errorData.title) {
@@ -331,15 +335,36 @@ const AdminGameAssets: React.FC = () => {
                 if (message.includes('Name')) assetErrors['name'] = 'Name is required';
                 if (message.includes('Description')) assetErrors['description'] = 'Description is required';
                 if (message.includes('Biography')) assetErrors['biography'] = 'Biography is required';
+                if (message.includes('FactionId') || message.includes('faction')) {
+                  assetErrors['factionid'] = 'Faction is required';
+                }
+              }
+              // Handle response with message property
+              else if (errorData.message) {
+                const message = errorData.message;
+                if (message.includes('Name')) assetErrors['name'] = 'Name is required';
+                if (message.includes('Description')) assetErrors['description'] = 'Description is required';
+                if (message.includes('Biography')) assetErrors['biography'] = 'Biography is required';
+                if (message.includes('FactionId') || message.includes('faction')) {
+                  assetErrors['factionid'] = 'Faction is required';
+                }
               }
 
-              // Only show validation errors if we successfully parsed some
-              if (Object.keys(assetErrors).length > 0) {
-                setValidationErrors(prev => ({
-                  ...prev,
-                  [asset.id]: assetErrors
-                }));
+              // Show validation errors on the page
+              setValidationErrors(prev => ({
+                ...prev,
+                [asset.id]: assetErrors
+              }));
+
+              // If no specific field errors were parsed, show general error
+              if (Object.keys(assetErrors).length === 0) {
+                console.error('Unable to parse validation errors. Full error data:', errorData);
+                alert(`Validation failed: ${JSON.stringify(errorData)}`);
               }
+            } else {
+              // Non-validation error
+              console.error('Non-validation error:', error);
+              alert(`Failed to save: ${error.message || 'Unknown error'}`);
             }
 
             // Don't throw - continue with other assets but show this error
@@ -453,14 +478,18 @@ const AdminGameAssets: React.FC = () => {
       }
     });
 
-    // Set contextual defaults based on asset type
-    if (selectedAssetType === 'units' && selectedFaction) {
-      newAsset.factionId = selectedFaction;
+    // Set contextual defaults based on asset type and selected filters
+    if (selectedAssetType === 'units') {
+      if (selectedFaction) {
+        newAsset.factionId = selectedFaction; // Use the selected faction from the filter
+      }
       newAsset.upgradeLevel = unitFilter === 'normal' ? 0 : unitFilter === 'upgrade1' ? 1 : 2;
       newAsset.isUpgraded = unitFilter !== 'normal';
       newAsset.tier = 1;
-    } else if (selectedAssetType === 'heroes' && selectedFaction) {
-      newAsset.factionId = selectedFaction;
+    } else if (selectedAssetType === 'heroes') {
+      if (selectedFaction) {
+        newAsset.factionId = selectedFaction; // Use the selected faction from the filter
+      }
       newAsset.rarityLevel = 1;
     }
 
