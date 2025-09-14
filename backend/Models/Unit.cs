@@ -26,7 +26,7 @@ public class Unit
     [Required]
     public int FactionId { get; set; }
     [ForeignKey("FactionId")]
-    public Faction Faction { get; set; } = null!;
+    public Faction? Faction { get; set; }
     
     // Unit tier and cost
     public int Tier { get; set; } = 1; // 1-7 typical for HoMM
@@ -41,6 +41,8 @@ public class Unit
     public int Health { get; set; } = 0;
     public int Speed { get; set; } = 0;
     public int Initiative { get; set; } = 0;
+    public int Morale { get; set; } = 0;
+    public int Luck { get; set; } = 0;
     
     // Unit characteristics
     public string? Size { get; set; } // "Small", "Medium", "Large", "Huge"

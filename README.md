@@ -17,6 +17,7 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 - **Hybrid Batch Thumbnail Processing**: Intelligent 60-minute batch sync system with manual admin triggers, GitHub Actions deployment, and cost-optimized architecture
 - **Complete Game Asset Management System**: Professional admin interface for managing all game assets (factions, units, heroes, spells) with inline editing, batch operations, and comprehensive validation
 - **Advanced Admin Workflow**: Intuitive batch editing system with local-only changes, Save/Revert controls, and inline validation replacing popup dialogs
+- **Enhanced Data Entry Experience**: Tab navigation for seamless field-to-field movement, fixed numeric value display (0 values now properly shown), and comprehensive unit statistics including Morale/Luck fields
 - **Responsive Table Design**: Fully responsive asset management tables with intelligent column sizing, icon-based actions, and professional dropdown components
 
 ### Technical Excellence

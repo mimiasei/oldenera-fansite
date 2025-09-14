@@ -99,7 +99,7 @@ const FactionDetail: React.FC = () => {
   }
 
   const getTierName = (tier: number) => {
-    const tierNames = ['', 'Basic', 'Advanced', 'Elite', 'Champion', 'Legendary', 'Ultimate', 'Divine'];
+    const tierNames = ['', '1', '2', '3', '4', '5', '6', '7'];
     return tierNames[tier] || `Tier ${tier}`;
   };
 

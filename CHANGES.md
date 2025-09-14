@@ -2,15 +2,25 @@
 
 ## 2025-09-14
 
-### Game Asset Management Validation & UX Improvements
+### Enhanced Game Asset Management System - Major UX Improvements
+- **Fixed numeric value display issue** - Resolved frontend display bug where `0` values (upgradeLevel, morale, luck) appeared empty due to JavaScript truthiness checks. Changed display logic from `value || ''` to `value !== null && value !== undefined ? value : ''`
+- **Added Tab navigation for data entry** - Implemented seamless Tab key navigation between table cells for rapid data entry. Users can now press Tab to automatically save current field and move to next field (right), or wrap to next row at row end
+- **Added Morale and Luck fields** - Extended Unit model with new Morale and Luck integer properties, created database migration, updated API controller, and added frontend columns for comprehensive unit statistics
+- **Removed Size field** - Eliminated Size column from units table as requested, streamlining the admin interface
+- **Enhanced inline editing experience** - Tab navigation works across all input types (text, number, dropdown, textarea) with smart saving and focus management
 - **Fixed validation error display system** - Server validation errors now properly appear as red borders around invalid table cells with detailed hover tooltips
 - **Enhanced faction assignment logic** - New units and heroes automatically inherit `factionId` from the selected faction filter dropdown (no separate faction column needed)
 - **Improved error handling and debugging** - Added comprehensive console logging of request payloads and server responses for better debugging
 - **Expanded error parsing capabilities** - Enhanced validation error parsing to handle ASP.NET Core ModelState errors, string messages, problem details, and custom response formats
 - **Streamlined user experience** - Users select faction once via existing filter dropdown, then all new assets automatically get proper faction assignment
 
+### Database Changes
+- **Migration: AddMoraleAndLuckToUnits** - Added `Morale` and `Luck` integer columns to Units table with default value 0
+- **Backend model updates** - Updated Unit model and UnitController to handle new fields
+- **API compatibility** - All existing units automatically have morale=0 and luck=0, maintaining backward compatibility
+
 ### Brief Summary
-Resolved critical validation feedback issues in the game asset management system. Users now see clear visual indicators for validation errors directly on invalid table cells, and faction assignment works seamlessly through the existing faction filter dropdown without requiring additional table columns.
+Major UX improvements to the game asset management system including Tab navigation for rapid data entry, fixed numeric value display, and comprehensive unit statistics with Morale/Luck fields. The admin interface now provides a much more efficient and user-friendly experience for managing game content.
 
 ## 2025-09-12
 

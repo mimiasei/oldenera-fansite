@@ -60,8 +60,9 @@ const AdminGameAssets: React.FC = () => {
           { key: 'health', label: 'Health', type: 'number' },
           { key: 'speed', label: 'Speed', type: 'number' },
           { key: 'initiative', label: 'Initiative', type: 'number' },
+          { key: 'morale', label: 'Morale', type: 'number' },
+          { key: 'luck', label: 'Luck', type: 'number' },
           { key: 'unitType', label: 'Type', type: 'select', options: ['Infantry', 'Ranged', 'Cavalry', 'Flying', 'Magic'] },
-          { key: 'size', label: 'Size', type: 'select', options: ['Small', 'Medium', 'Large', 'Huge'] },
           { key: 'upgradeLevel', label: 'Upgrade', type: 'select', options: ['0', '1', '2'] },
           { key: 'weeklyGrowth', label: 'Growth', type: 'number' },
           { key: 'specialAbilities', label: 'Abilities', type: 'json' },
@@ -207,6 +208,33 @@ const AdminGameAssets: React.FC = () => {
     setTempValue('');
   };
 
+  // Navigate to next cell on Tab key
+  const navigateToNextCell = (currentAssetId: number, currentField: string) => {
+    const columnConfig = getColumnConfig(selectedAssetType);
+    const currentColumnIndex = columnConfig.findIndex(col => col.key === currentField);
+    const currentAssetIndex = assets.findIndex(asset => asset.id === currentAssetId);
+
+    if (currentColumnIndex === -1 || currentAssetIndex === -1) return;
+
+    let nextAssetIndex = currentAssetIndex;
+    let nextColumnIndex = currentColumnIndex + 1;
+
+    // If we're at the last column, move to first column of next row
+    if (nextColumnIndex >= columnConfig.length) {
+      nextColumnIndex = 0;
+      nextAssetIndex = currentAssetIndex + 1;
+    }
+
+    // If we're at the last row, do nothing
+    if (nextAssetIndex >= assets.length) return;
+
+    const nextAsset = assets[nextAssetIndex];
+    const nextColumn = columnConfig[nextColumnIndex];
+
+    // Start editing the next cell
+    handleCellClick(nextAsset.id, nextColumn.key, nextAsset[nextColumn.key]);
+  };
+
   // Client-side validation helper
   const validateAsset = (asset: GameAsset, assetType: GameAssetType) => {
     const errors: {[field: string]: string} = {};
@@ -239,6 +267,7 @@ const AdminGameAssets: React.FC = () => {
   };
 
   const handleSaveChanges = async () => {
+    console.log('🚀 handleSaveChanges called with hasChanges:', hasChanges);
     if (!hasChanges) return;
 
     setSavingChanges(true);
@@ -271,19 +300,28 @@ const AdminGameAssets: React.FC = () => {
           try {
             // Remove temporary fields before creating
             const { id, isNew, ...createData } = asset;
+            console.log(`🔄 About to create ${selectedAssetType.slice(0, -1)} with data:`, createData);
 
             let createdAsset;
             if (selectedAssetType === 'factions') {
-              const response = await factionApi.create(createData);
+              console.log('📤 Calling factionApi.create...');
+              const response = await factionApi.create(createData as any);
               createdAsset = response.data;
             } else if (selectedAssetType === 'units') {
-              const response = await unitApi.create(createData);
+              // Fix data types for unit creation
+              const unitData = {
+                ...createData,
+                upgradeLevel: parseInt(createData.upgradeLevel) || 0
+              };
+              console.log('📤 Calling unitApi.create with fixed data types:', unitData);
+              const response = await unitApi.create(unitData as any);
+              console.log('📥 Unit creation response:', response);
               createdAsset = response.data;
             } else if (selectedAssetType === 'heroes') {
-              const response = await heroApi.create(createData);
+              const response = await heroApi.create(createData as any);
               createdAsset = response.data;
             } else if (selectedAssetType === 'spells') {
-              const response = await spellApi.create(createData);
+              const response = await spellApi.create(createData as any);
               createdAsset = response.data;
             }
 
@@ -324,7 +362,7 @@ const AdminGameAssets: React.FC = () => {
                 if (errorData.includes('Biography') && errorData.includes('required')) {
                   assetErrors['biography'] = 'Biography is required';
                 }
-                if (errorData.includes('FactionId') || errorData.includes('faction')) {
+                if (errorData.includes('FactionId') || errorData.includes('faction') || errorData.includes('Faction')) {
                   assetErrors['factionid'] = 'Faction is required';
                 }
               }
@@ -335,7 +373,7 @@ const AdminGameAssets: React.FC = () => {
                 if (message.includes('Name')) assetErrors['name'] = 'Name is required';
                 if (message.includes('Description')) assetErrors['description'] = 'Description is required';
                 if (message.includes('Biography')) assetErrors['biography'] = 'Biography is required';
-                if (message.includes('FactionId') || message.includes('faction')) {
+                if (message.includes('FactionId') || message.includes('faction') || message.includes('Faction')) {
                   assetErrors['factionid'] = 'Faction is required';
                 }
               }
@@ -345,7 +383,7 @@ const AdminGameAssets: React.FC = () => {
                 if (message.includes('Name')) assetErrors['name'] = 'Name is required';
                 if (message.includes('Description')) assetErrors['description'] = 'Description is required';
                 if (message.includes('Biography')) assetErrors['biography'] = 'Biography is required';
-                if (message.includes('FactionId') || message.includes('faction')) {
+                if (message.includes('FactionId') || message.includes('faction') || message.includes('Faction')) {
                   assetErrors['factionid'] = 'Faction is required';
                 }
               }
@@ -480,18 +518,28 @@ const AdminGameAssets: React.FC = () => {
 
     // Set contextual defaults based on asset type and selected filters
     if (selectedAssetType === 'units') {
+      console.log('🔍 Creating unit - selectedFaction:', selectedFaction);
       if (selectedFaction) {
         newAsset.factionId = selectedFaction; // Use the selected faction from the filter
+        console.log('✅ Set unit factionId to:', selectedFaction);
+      } else {
+        console.warn('⚠️ No faction selected for unit creation');
       }
       newAsset.upgradeLevel = unitFilter === 'normal' ? 0 : unitFilter === 'upgrade1' ? 1 : 2;
       newAsset.isUpgraded = unitFilter !== 'normal';
       newAsset.tier = 1;
     } else if (selectedAssetType === 'heroes') {
+      console.log('🔍 Creating hero - selectedFaction:', selectedFaction);
       if (selectedFaction) {
         newAsset.factionId = selectedFaction; // Use the selected faction from the filter
+        console.log('✅ Set hero factionId to:', selectedFaction);
+      } else {
+        console.warn('⚠️ No faction selected for hero creation');
       }
       newAsset.rarityLevel = 1;
     }
+
+    console.log('🔍 New asset created:', newAsset);
 
     // Add to local state only
     setAssets(prev => [newAsset, ...prev]); // Add at beginning for visibility
@@ -537,6 +585,11 @@ const AdminGameAssets: React.FC = () => {
             onKeyDown={(e) => {
               if (e.key === 'Enter') handleCellSave(asset.id, column.key, tempValue);
               if (e.key === 'Escape') setEditingCell(null);
+              if (e.key === 'Tab') {
+                e.preventDefault();
+                handleCellSave(asset.id, column.key, tempValue);
+                setTimeout(() => navigateToNextCell(asset.id, column.key), 50);
+              }
             }}
             className="text-sm border-amber-300"
             size="sm"
@@ -574,6 +627,11 @@ const AdminGameAssets: React.FC = () => {
                 handleCellSave(asset.id, column.key, tempValue);
               }
               if (e.key === 'Escape') setEditingCell(null);
+              if (e.key === 'Tab' && !e.shiftKey) {
+                e.preventDefault();
+                handleCellSave(asset.id, column.key, tempValue);
+                setTimeout(() => navigateToNextCell(asset.id, column.key), 50);
+              }
             }}
             className="w-full px-2 py-1 border border-amber-300 rounded text-sm resize-y"
             rows={3}
@@ -591,6 +649,11 @@ const AdminGameAssets: React.FC = () => {
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleCellSave(asset.id, column.key, tempValue);
             if (e.key === 'Escape') setEditingCell(null);
+            if (e.key === 'Tab') {
+              e.preventDefault();
+              handleCellSave(asset.id, column.key, tempValue);
+              setTimeout(() => navigateToNextCell(asset.id, column.key), 50);
+            }
           }}
           className="w-full px-2 py-1 border border-amber-300 rounded text-sm"
           autoFocus
@@ -612,7 +675,7 @@ const AdminGameAssets: React.FC = () => {
       if (typeof value === 'string' && value.length > 20 && column.type !== 'boolean') {
         return <span title={value} className="truncate block">{value.substring(0, 20)}...</span>;
       }
-      return value || '';
+      return value !== null && value !== undefined ? value : '';
     })();
 
     return (

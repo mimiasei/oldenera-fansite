@@ -221,6 +221,8 @@ public class UnitController : ControllerBase
         existingUnit.Health = unit.Health;
         existingUnit.Speed = unit.Speed;
         existingUnit.Initiative = unit.Initiative;
+        existingUnit.Morale = unit.Morale;
+        existingUnit.Luck = unit.Luck;
         existingUnit.Size = unit.Size;
         existingUnit.UnitType = unit.UnitType;
         existingUnit.IsUpgraded = unit.IsUpgraded;

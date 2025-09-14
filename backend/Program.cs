@@ -264,6 +264,7 @@ app.UseCors("AllowReactApp");
 app.UseAuthentication();
 app.UseAuthorization();
 
+
 app.MapControllers();
 
 // Add root endpoint for health check
