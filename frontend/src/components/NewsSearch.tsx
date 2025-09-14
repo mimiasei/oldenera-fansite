@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { NewsFilters } from '../services/api';
 import { useNewsFilters } from '../hooks/useSWR';
+import Dropdown from './common/Dropdown';
 
 interface NewsSearchProps {
   filters: NewsFilters;
@@ -70,20 +71,13 @@ const NewsSearch = ({ filters, onFiltersChange }: NewsSearchProps) => {
             <label htmlFor="tag-filter" className="block text-sm font-medium text-gray-700 mb-1">
               Filter by Tag
             </label>
-            <select
-              id="tag-filter"
+            <Dropdown
               value={selectedTag}
-              onChange={(e) => handleTagChange(e.target.value)}
+              onChange={(value) => handleTagChange(value as string)}
+              options={availableFilters.tags}
+              placeholder="All Tags"
               disabled={filtersLoading}
-              className="block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm disabled:bg-gray-100"
-            >
-              <option value="">All Tags</option>
-              {availableFilters.tags.map((tag) => (
-                <option key={tag} value={tag}>
-                  {tag}
-                </option>
-              ))}
-            </select>
+            />
           </div>
 
           {/* Author Filter */}
@@ -91,20 +85,13 @@ const NewsSearch = ({ filters, onFiltersChange }: NewsSearchProps) => {
             <label htmlFor="author-filter" className="block text-sm font-medium text-gray-700 mb-1">
               Filter by Author
             </label>
-            <select
-              id="author-filter"
+            <Dropdown
               value={selectedAuthor}
-              onChange={(e) => handleAuthorChange(e.target.value)}
+              onChange={(value) => handleAuthorChange(value as string)}
+              options={availableFilters.authors}
+              placeholder="All Authors"
               disabled={filtersLoading}
-              className="block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm disabled:bg-gray-100"
-            >
-              <option value="">All Authors</option>
-              {availableFilters.authors.map((author) => (
-                <option key={author} value={author}>
-                  {author}
-                </option>
-              ))}
-            </select>
+            />
           </div>
         </div>
 

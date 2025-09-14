@@ -23,6 +23,8 @@ public class UnitController : ControllerBase
         [FromQuery] int? factionId = null,
         [FromQuery] int? tier = null,
         [FromQuery] string? unitType = null,
+        [FromQuery] bool? isUpgraded = null,
+        [FromQuery] int? upgradeLevel = null,
         [FromQuery] bool activeOnly = true,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 50)
@@ -47,6 +49,16 @@ public class UnitController : ControllerBase
         if (!string.IsNullOrEmpty(unitType))
         {
             query = query.Where(u => u.UnitType == unitType);
+        }
+
+        if (isUpgraded.HasValue)
+        {
+            query = query.Where(u => u.IsUpgraded == isUpgraded.Value);
+        }
+
+        if (upgradeLevel.HasValue)
+        {
+            query = query.Where(u => u.UpgradeLevel == upgradeLevel.Value);
         }
 
         var totalCount = await query.CountAsync();
@@ -212,6 +224,7 @@ public class UnitController : ControllerBase
         existingUnit.Size = unit.Size;
         existingUnit.UnitType = unit.UnitType;
         existingUnit.IsUpgraded = unit.IsUpgraded;
+        existingUnit.UpgradeLevel = unit.UpgradeLevel;
         existingUnit.BaseUnitId = unit.BaseUnitId;
         existingUnit.SpecialAbilities = unit.SpecialAbilities;
         existingUnit.Immunities = unit.Immunities;

@@ -13,8 +13,8 @@ using DotNetEnv;
 
 Console.WriteLine("=== Starting OldenEra API ===");
 
-// Check if running CLI commands
-if (args.Length > 0)
+// Check if running CLI commands (but ignore EF commands)
+if (args.Length > 0 && !IsEntityFrameworkCommand(args))
 {
     // This is a CLI command, not the web server
     await RunCliCommandsAsync(args);
@@ -281,6 +281,17 @@ app.MapGet("/health", () => new {
 });
 
 app.Run();
+
+// Helper function to detect Entity Framework commands
+static bool IsEntityFrameworkCommand(string[] args)
+{
+    return args.Any(arg => arg.Contains("ef", StringComparison.OrdinalIgnoreCase) ||
+                          arg.Contains("migrations", StringComparison.OrdinalIgnoreCase) ||
+                          arg.Contains("database", StringComparison.OrdinalIgnoreCase) ||
+                          arg.Contains("--applicationName", StringComparison.OrdinalIgnoreCase) ||
+                          arg.Contains("--no-build", StringComparison.OrdinalIgnoreCase) ||
+                          arg.Contains("--verbose", StringComparison.OrdinalIgnoreCase));
+}
 
 // CLI Command Runner Function
 async Task RunCliCommandsAsync(string[] arguments)

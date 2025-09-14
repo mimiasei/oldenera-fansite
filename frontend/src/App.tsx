@@ -22,6 +22,7 @@ import FactionDetail from './pages/FactionDetail';
 import Screenshots from './pages/Screenshots';
 import AdminMedia from './pages/AdminMedia';
 import AdminMediaEdit from './pages/AdminMediaEdit';
+import AdminGameAssets from './pages/admin/AdminGameAssets';
 import Forum from './pages/Forum';
 import NotificationContainer from './components/NotificationContainer';
 import { Analytics } from '@vercel/analytics/react';
@@ -96,6 +97,11 @@ function App() {
               <Route path="/admin/media/:id/edit" element={
                 <ProtectedRoute requireModerator={true}>
                   <AdminMediaEdit />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/game-assets" element={
+                <ProtectedRoute requireModerator={true}>
+                  <AdminGameAssets />
                 </ProtectedRoute>
               } />
               

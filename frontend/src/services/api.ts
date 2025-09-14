@@ -295,18 +295,48 @@ export const gameInfoApi = {
 
 // Hero API (basic endpoints)
 export const heroApi = {
+  getAll: (filters: { factionId?: number; heroClass?: string; heroType?: string; activeOnly?: boolean } = {}) => {
+    const params = new URLSearchParams();
+    if (filters.factionId) params.append('factionId', filters.factionId.toString());
+    if (filters.heroClass) params.append('heroClass', filters.heroClass);
+    if (filters.heroType) params.append('heroType', filters.heroType);
+    if (filters.activeOnly !== undefined) params.append('activeOnly', filters.activeOnly.toString());
+
+    return api.get<Hero[]>(`/hero?${params.toString()}`);
+  },
+  getById: (id: number) => api.get<Hero>(`/hero/${id}`),
   getByFaction: (factionId: number, heroClass?: string, heroType?: string) => {
     const params = new URLSearchParams();
     if (heroClass) params.append('heroClass', heroClass);
     if (heroType) params.append('heroType', heroType);
-    
+
     return api.get<Hero[]>(`/faction/${factionId}/heroes?${params.toString()}`);
   },
+  getFilters: () => api.get<{ heroClasses: string[]; heroTypes: string[]; factions: Array<{ id: number; name: string }> }>('/hero/filters'),
+  create: (hero: Omit<Hero, 'id' | 'createdAt' | 'updatedAt' | 'faction'>) =>
+    api.post<Hero>('/hero', hero),
+  update: (id: number, hero: Partial<Hero>) =>
+    api.put(`/hero/${id}`, hero),
+  delete: (id: number) => api.delete(`/hero/${id}`),
 };
 
-// Spell API (basic endpoints for future expansion)
+// Spell API
 export const spellApi = {
-  // Future implementation for spell management
+  getAll: (filters: { school?: string; level?: number; type?: string; isCommon?: boolean; activeOnly?: boolean } = {}) => {
+    const params = new URLSearchParams();
+    if (filters.school) params.append('school', filters.school);
+    if (filters.level) params.append('level', filters.level.toString());
+    if (filters.type) params.append('type', filters.type);
+    if (filters.isCommon !== undefined) params.append('isCommon', filters.isCommon.toString());
+    if (filters.activeOnly !== undefined) params.append('activeOnly', filters.activeOnly.toString());
+
+    return api.get<any[]>(`/spell?${params.toString()}`);
+  },
+  getById: (id: number) => api.get<any>(`/spell/${id}`),
+  getFilters: () => api.get<{ schools: string[]; levels: number[]; types: string[] }>('/spell/filters'),
+  create: (spell: any) => api.post<any>('/spell', spell),
+  update: (id: number, spell: any) => api.put(`/spell/${id}`, spell),
+  delete: (id: number) => api.delete(`/spell/${id}`),
 };
 
 // Media API

@@ -46,6 +46,7 @@ public class Unit
     public string? Size { get; set; } // "Small", "Medium", "Large", "Huge"
     public string? UnitType { get; set; } // "Infantry", "Ranged", "Cavalry", "Flying", "Magic"
     public bool IsUpgraded { get; set; } = false;
+    public int UpgradeLevel { get; set; } = 0; // 0 = Normal, 1 = Upgrade 1, 2 = Upgrade 2
     public int? BaseUnitId { get; set; } // Reference to base unit if this is an upgrade
     
     // Special abilities

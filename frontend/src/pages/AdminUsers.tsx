@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import useSWR, { mutate } from 'swr';
 import { fetcher } from '../services/api';
 import api from '../services/api';
+import Dropdown from '../components/common/Dropdown';
 
 interface User {
   id: string;
@@ -174,16 +175,16 @@ const AdminUsers: React.FC = () => {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Role</label>
-            <select
+            <Dropdown
               value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-            >
-              <option value="">All Roles</option>
-              <option value="Admin">Admin</option>
-              <option value="Moderator">Moderator</option>
-              <option value="User">User</option>
-            </select>
+              onChange={(value) => setSelectedRole(value as string)}
+              options={[
+                { value: '', label: 'All Roles' },
+                { value: 'Admin', label: 'Admin' },
+                { value: 'Moderator', label: 'Moderator' },
+                { value: 'User', label: 'User' }
+              ]}
+            />
           </div>
 
           <div className="flex items-end">
