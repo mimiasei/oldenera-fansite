@@ -1,11 +1,24 @@
 import { Link } from 'react-router-dom';
 import { useLatestNews } from '../hooks/useSWR';
 import { NewsCardSkeleton } from '../components/skeletons/NewsArticleSkeleton';
+import SEO from '../components/SEO';
+import { generateWebsiteStructuredData, generateGameStructuredData } from '../utils/structuredData';
 
 const Home = () => {
   const { latestNews, isLoading, isError } = useLatestNews();
 
+  const websiteStructuredData = generateWebsiteStructuredData();
+  const gameStructuredData = generateGameStructuredData();
+
   return (
+    <>
+      <SEO
+        title="Home"
+        description="Your ultimate destination for Heroes of Might and Magic: Olden Era news, updates, and community discussion. Stay informed about the return of the legendary strategy series."
+        keywords="Heroes of Might and Magic, Olden Era, strategy games, fantasy games, turn-based strategy, news, community"
+        url="/"
+        structuredData={[websiteStructuredData, gameStructuredData]}
+      />
     <div className="space-y-12 bg-fill bg-center bg-no-repeat"         
          style={{
         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.7)), url('/images/logos/OE_wallpapper.webp')`
@@ -101,6 +114,7 @@ const Home = () => {
         </div>
       </section>
     </div>
+    </>
   );
 };
 

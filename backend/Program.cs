@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using System.Text;
 using DotNetEnv;
+using AspNetCoreRateLimit;
 
 Console.WriteLine("=== Starting OldenEra API ===");
 
@@ -163,6 +164,48 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("ModeratorOrAdmin", policy => policy.RequireRole("Moderator", "Admin"));
 });
 
+// Add rate limiting
+builder.Services.AddMemoryCache();
+builder.Services.Configure<IpRateLimitOptions>(options =>
+{
+    options.EnableEndpointRateLimiting = true;
+    options.StackBlockedRequests = false;
+    options.HttpStatusCode = 429;
+    options.RealIpHeader = "X-Real-IP";
+    options.ClientIdHeader = "X-ClientId";
+    options.GeneralRules = new List<RateLimitRule>
+    {
+        new RateLimitRule
+        {
+            Endpoint = "*",
+            Period = "1m",
+            Limit = 100,
+        },
+        new RateLimitRule
+        {
+            Endpoint = "*",
+            Period = "15m",
+            Limit = 1000,
+        },
+        new RateLimitRule
+        {
+            Endpoint = "*",
+            Period = "1h",
+            Limit = 5000,
+        }
+    };
+});
+
+builder.Services.Configure<IpRateLimitPolicies>(options =>
+{
+    options.IpRules = new List<IpRateLimitPolicy>();
+});
+
+builder.Services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+
 // Add custom services
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IImageProcessingService, ImageProcessingService>();
@@ -254,11 +297,40 @@ else
     });
 }
 
+// Add security headers
+app.Use(async (context, next) =>
+{
+    // Security headers for production
+    context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
+    context.Response.Headers.Append("X-Frame-Options", "DENY");
+    context.Response.Headers.Append("X-XSS-Protection", "1; mode=block");
+    context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
+    context.Response.Headers.Append("Permissions-Policy", "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()");
+
+    // Content Security Policy
+    var csp = "default-src 'self'; " +
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' disqus.com *.disqus.com *.disquscdn.com; " +
+              "style-src 'self' 'unsafe-inline' fonts.googleapis.com *.disquscdn.com; " +
+              "font-src 'self' fonts.gstatic.com *.disquscdn.com; " +
+              "img-src 'self' data: blob: *.disquscdn.com disqus.com referrer.disqus.com; " +
+              "connect-src 'self' disqus.com *.disqus.com *.disquscdn.com; " +
+              "frame-src disqus.com; " +
+              "object-src 'none'; " +
+              "base-uri 'self';";
+    context.Response.Headers.Append("Content-Security-Policy", csp);
+
+    await next();
+});
+
 // Skip HTTPS redirection in production (Render handles this)
 if (app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
 }
+
+// Add rate limiting
+app.UseIpRateLimiting();
+
 app.UseCors("AllowReactApp");
 
 app.UseAuthentication();

@@ -2,6 +2,8 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useNewsArticle } from '../hooks/useSWR';
 import DisqusComments from '../components/DisqusComments';
 import AdminEditButton from '../components/AdminEditButton';
+import SEO from '../components/SEO';
+import { generateNewsArticleStructuredData, generateBreadcrumbStructuredData } from '../utils/structuredData';
 
 const NewsArticle = () => {
   const { id } = useParams<{ id: string }>();
@@ -43,8 +45,31 @@ const NewsArticle = () => {
     );
   }
 
+  const articleStructuredData = generateNewsArticleStructuredData(article);
+  const breadcrumbStructuredData = generateBreadcrumbStructuredData([
+    { name: 'Home', url: '/' },
+    { name: 'News', url: '/news' },
+    { name: article.title, url: `/news/${article.id}` }
+  ]);
+
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
+      <SEO
+        title={article.title}
+        description={article.summary}
+        keywords={article.tags?.join(', ')}
+        image={article.imageUrl}
+        url={`/news/${article.id}`}
+        type="article"
+        article={{
+          publishedTime: article.publishedAt,
+          modifiedTime: article.updatedAt,
+          author: article.author,
+          tags: article.tags
+        }}
+        structuredData={[articleStructuredData, breadcrumbStructuredData]}
+      />
+      <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         {/* Breadcrumb Navigation */}
         <nav className="mb-6">
@@ -172,6 +197,7 @@ const NewsArticle = () => {
         </section>
       </div>
     </div>
+    </>
   );
 };
 

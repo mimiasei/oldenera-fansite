@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AppProvider } from './store';
@@ -29,7 +30,7 @@ import { Analytics } from '@vercel/analytics/react';
 
 function App() {
   return (
-    <div>
+    <HelmetProvider>
       <ThemeProvider>
       <AuthProvider>
         <AppProvider>
@@ -120,10 +121,10 @@ function App() {
           </Router>
         </AppProvider>
       </AuthProvider>
-    </ThemeProvider>
-      
+      </ThemeProvider>
+
       <Analytics />
-    </div>
+    </HelmetProvider>
   );
 }
 

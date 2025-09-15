@@ -4,14 +4,29 @@ import { useNews } from '../hooks/useSWR';
 import { NewsFilters } from '../services/api';
 import NewsSearch from '../components/NewsSearch';
 import { NewsArticleSkeleton } from '../components/skeletons/NewsArticleSkeleton';
+import SEO from '../components/SEO';
+import { generateBreadcrumbStructuredData } from '../utils/structuredData';
 
 const News = () => {
   const [filters, setFilters] = useState<NewsFilters>({});
   const { news, isLoading, isError } = useNews(filters);
 
+  const breadcrumbStructuredData = generateBreadcrumbStructuredData([
+    { name: 'Home', url: '/' },
+    { name: 'News', url: '/news' }
+  ]);
+
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <>
+        <SEO
+          title="News"
+          description="Stay up to date with the latest Heroes of Might and Magic: Olden Era news, updates, announcements, and community highlights."
+          keywords="Heroes of Might and Magic news, Olden Era updates, game announcements, strategy game news"
+          url="/news"
+          structuredData={breadcrumbStructuredData}
+        />
+        <div className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold mb-8 text-center font-fantasy">
           Latest News
         </h1>
@@ -21,22 +36,40 @@ const News = () => {
           ))}
         </div>
       </div>
+      </>
     );
   }
 
   if (isError) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
+      <>
+        <SEO
+          title="News"
+          description="Stay up to date with the latest Heroes of Might and Magic: Olden Era news, updates, announcements, and community highlights."
+          keywords="Heroes of Might and Magic news, Olden Era updates, game announcements, strategy game news"
+          url="/news"
+          structuredData={breadcrumbStructuredData}
+        />
+        <div className="container mx-auto px-4 py-8 text-center">
         <p className="text-red-600 text-lg">Failed to load news articles</p>
         <p className="text-sm text-gray-500 mt-2">
           Make sure the ASP.NET Core backend is running: <code className="bg-gray-200 px-2 py-1 rounded">cd backend && dotnet run</code>
         </p>
       </div>
+      </>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
+      <SEO
+        title="News"
+        description="Stay up to date with the latest Heroes of Might and Magic: Olden Era news, updates, announcements, and community highlights."
+        keywords="Heroes of Might and Magic news, Olden Era updates, game announcements, strategy game news"
+        url="/news"
+        structuredData={breadcrumbStructuredData}
+      />
+      <div className="container mx-auto px-4 py-8">
       <h1 className="text-4xl font-bold mb-8 text-center font-fantasy">
         Latest News
       </h1>
@@ -115,6 +148,7 @@ const News = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

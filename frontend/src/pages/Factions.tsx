@@ -3,13 +3,28 @@ import { Link } from 'react-router-dom';
 import { useFactions } from '../hooks/useSWR';
 import { FactionGridSkeleton } from '../components/skeletons/FactionSkeleton';
 import AdminEditButton from '../components/AdminEditButton';
+import SEO from '../components/SEO';
+import { generateBreadcrumbStructuredData } from '../utils/structuredData';
 
 const Factions: React.FC = () => {
   const { factions, isLoading, isError, error } = useFactions({ includeUnits: true, includeHeroes: true });
 
+  const breadcrumbStructuredData = generateBreadcrumbStructuredData([
+    { name: 'Home', url: '/' },
+    { name: 'Factions', url: '/factions' }
+  ]);
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+      <>
+        <SEO
+          title="Factions"
+          description="Discover the mighty factions of Heroes of Might and Magic: Olden Era, each with their unique strengths, legendary heroes, and powerful armies ready for battle."
+          keywords="Heroes of Might and Magic factions, Olden Era factions, strategy game factions, fantasy armies"
+          url="/factions"
+          structuredData={breadcrumbStructuredData}
+        />
+        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-primary-900 to-primary-800 text-white">
           <div className="container mx-auto px-4 py-16 text-center">
@@ -26,12 +41,21 @@ const Factions: React.FC = () => {
           <FactionGridSkeleton count={3} />
         </div>
       </div>
+      </>
     );
   }
 
   if (isError) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+      <>
+        <SEO
+          title="Factions"
+          description="Discover the mighty factions of Heroes of Might and Magic: Olden Era, each with their unique strengths, legendary heroes, and powerful armies ready for battle."
+          keywords="Heroes of Might and Magic factions, Olden Era factions, strategy game factions, fantasy armies"
+          url="/factions"
+          structuredData={breadcrumbStructuredData}
+        />
+        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <div className="bg-red-900/50 border border-red-700 rounded-lg p-6 max-w-md mx-auto">
@@ -46,11 +70,20 @@ const Factions: React.FC = () => {
           </div>
         </div>
       </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+    <>
+      <SEO
+        title="Factions"
+        description="Discover the mighty factions of Heroes of Might and Magic: Olden Era, each with their unique strengths, legendary heroes, and powerful armies ready for battle."
+        keywords="Heroes of Might and Magic factions, Olden Era factions, strategy game factions, fantasy armies"
+        url="/factions"
+        structuredData={breadcrumbStructuredData}
+      />
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-primary-900 to-primary-800 text-white">
         <div className="container mx-auto px-4 py-16 text-center">
@@ -172,6 +205,7 @@ const Factions: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

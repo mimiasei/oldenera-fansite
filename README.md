@@ -19,6 +19,9 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 - **Advanced Admin Workflow**: Intuitive batch editing system with local-only changes, Save/Revert controls, and inline validation replacing popup dialogs
 - **Enhanced Data Entry Experience**: Tab navigation for seamless field-to-field movement, fixed numeric value display (0 values now properly shown), and comprehensive unit statistics including Morale/Luck fields
 - **Responsive Table Design**: Fully responsive asset management tables with intelligent column sizing, icon-based actions, and professional dropdown components
+- **Comprehensive SEO Optimization**: React Helmet Async with dynamic meta tags, Open Graph support, Twitter Cards, and advanced structured data (JSON-LD) for enhanced search visibility
+- **Production-Grade Security**: Rate limiting middleware, comprehensive security headers (CSP, X-Frame-Options, XSS protection), and API abuse protection
+- **Search Engine Optimization**: Dynamic XML sitemap generation, robots.txt with proper crawl directives, and optimized social media sharing
 
 ### Technical Excellence
 - **Production-Ready Deployment**: Fully deployed with automatic database migrations, environment detection, and API connectivity
@@ -27,6 +30,8 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 - **Migration Safety System**: Comprehensive schema validation tools, automated checking scripts, and error prevention guidelines
 - **Type-Safe Development**: Complete TypeScript coverage with strict mode compliance throughout
 - **Modern Performance**: SWR data fetching for optimal caching, Vite build optimization, and responsive design
+- **Enterprise Security**: Rate limiting (100 req/min, 1000 req/15min, 5000 req/hour), security headers, and Content Security Policy
+- **SEO Excellence**: Structured data markup, dynamic sitemap generation, social media optimization, and search engine compliance
 
 ### User Experience
 - **Fantasy-Themed Design**: Custom Tailwind CSS theme with Heroes of Might and Magic aesthetic
@@ -36,6 +41,7 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 - **Mobile-First Navigation**: Responsive hamburger menu with smooth animations, body scroll lock, and keyboard accessibility
 - **Interactive Content**: Tabbed interfaces, filtering systems, and comprehensive game content presentation
 - **Secure Authentication**: Production-grade password requirements, account lockout protection, and proper hash management
+- **Social Media Ready**: Optimized Open Graph and Twitter Card support for professional link previews and social sharing
 
 ## 🛠 Technology Stack
 
@@ -45,8 +51,10 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 - **Data Fetching**: SWR (Stale-While-Revalidate) for client-side caching and revalidation
 - **Styling**: Tailwind CSS v3 with custom fantasy theme and background imagery
 - **Build Tool**: Vite for fast development and optimized builds
-- **API**: RESTful API with Swagger documentation
+- **API**: RESTful API with Swagger documentation and rate limiting
 - **DevOps**: Docker Compose for database containerization
+- **SEO**: React Helmet Async with structured data (JSON-LD) and dynamic sitemap generation
+- **Security**: AspNetCoreRateLimit middleware with comprehensive security headers
 
 ## 📁 Project Structure
 
