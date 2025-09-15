@@ -2,18 +2,21 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { UpdateProfileRequest } from '../services/api';
 import AvatarSelector from '../components/AvatarSelector';
+import ChangePasswordModal from '../components/ChangePasswordModal';
 
 const Profile: React.FC = () => {
   const { user, logout, updateProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
+  const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
   const [formData, setFormData] = useState<UpdateProfileRequest>({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
     profilePictureUrl: user?.profilePictureUrl || ''
   });
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   if (!user) {
     return (
@@ -81,6 +84,13 @@ const Profile: React.FC = () => {
     if (isEditing) {
       setShowAvatarSelector(true);
     }
+  };
+
+  const handlePasswordChangeSuccess = () => {
+    setSuccessMessage('Password changed successfully! You will be signed out of all other devices.');
+    setTimeout(() => {
+      setSuccessMessage(null);
+    }, 5000);
   };
 
   return (
@@ -238,6 +248,17 @@ const Profile: React.FC = () => {
                   <p className="text-sm text-red-700">{error}</p>
                 </div>
               )}
+
+              {successMessage && (
+                <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center">
+                    <svg className="h-5 w-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <p className="text-sm text-green-700">{successMessage}</p>
+                  </div>
+                </div>
+              )}
               
               <div className="flex flex-col sm:flex-row gap-4">
                 {isEditing ? (
@@ -264,6 +285,15 @@ const Profile: React.FC = () => {
                       className="btn btn-primary"
                     >
                       Edit Profile
+                    </button>
+                    <button
+                      onClick={() => setShowChangePasswordModal(true)}
+                      className="btn btn-secondary bg-blue-100 text-blue-700 hover:bg-blue-200"
+                    >
+                      <svg className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-6 6c-3 0-5.197-1.756-5.91-4M9 17a2 2 0 01-2-2m-4 0a6 6 0 016-6c3 0 5.197 1.756 5.91 4M15 7a2 2 0 00-2-2M9 17a2 2 0 002 2m4 0a6 6 0 006-6M9 17a2 2 0 01-2-2m-4 0a6 6 0 016-6" />
+                      </svg>
+                      Change Password
                     </button>
                     <button
                       onClick={handleLogout}
@@ -312,6 +342,13 @@ const Profile: React.FC = () => {
           onClose={() => setShowAvatarSelector(false)}
         />
       )}
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal
+        isOpen={showChangePasswordModal}
+        onClose={() => setShowChangePasswordModal(false)}
+        onSuccess={handlePasswordChangeSuccess}
+      />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMediaItems, useMediaCategories } from '../hooks/useSWR';
 import { MediaFiltersParams } from '../services/api';
 import { MediaItem } from '../types';
@@ -12,9 +12,10 @@ const Screenshots: React.FC = () => {
     approvedOnly: true,
     pageSize: 20,
   });
-  
+
   const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [showFilterMenu, setShowFilterMenu] = useState<boolean>(false);
 
   const { mediaItems, isLoading, isError, error } = useMediaItems(filters);
   const { categories, isLoading: categoriesLoading } = useMediaCategories();
@@ -26,6 +27,41 @@ const Screenshots: React.FC = () => {
   const handleMediaTypeFilter = (mediaType: string | undefined) => {
     setFilters(prev => ({ ...prev, mediaType }));
   };
+
+  const clearAllFilters = () => {
+    setFilters({ approvedOnly: true, pageSize: 20 });
+  };
+
+  const activeFiltersCount = (filters.categoryId ? 1 : 0) + (filters.mediaType ? 1 : 0);
+
+  const getSelectedCategoryName = () => {
+    if (!filters.categoryId) return null;
+    return categories.find(c => c.id === filters.categoryId)?.name;
+  };
+
+  const closeFilterMenu = () => setShowFilterMenu(false);
+
+  // Handle keyboard events for filter menu
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (showFilterMenu && event.key === 'Escape') {
+        closeFilterMenu();
+      }
+    };
+
+    if (showFilterMenu) {
+      document.addEventListener('keydown', handleKeyDown);
+      // Prevent body scroll when menu is open
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [showFilterMenu]);
 
   const openLightbox = (item: MediaItem, index: number) => {
     setSelectedMedia(item);
@@ -69,11 +105,11 @@ const Screenshots: React.FC = () => {
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-primary-900 to-primary-800 text-white">
           <div className="container mx-auto px-4 py-16 text-center">
-            <h1 className="text-5xl font-bold mb-6 font-fantasy">Screenshots & Media</h1>
-            <p className="text-xl text-primary-100 max-w-3xl mx-auto">
-              Explore stunning visuals from Heroes of Might and Magic: Olden Era. Browse screenshots, 
-              concept art, character designs, and more from the upcoming game.
-            </p>
+            <h1 className="text-5xl font-bold mb-6 font-fantasy">Gallery</h1>
+            {/*<p className="text-xl text-primary-100 max-w-3xl mx-auto">*/}
+            {/*  Explore stunning visuals from Heroes of Might and Magic: Olden Era. Browse screenshots, */}
+            {/*  concept art, character designs, and more from the upcoming game.*/}
+            {/*</p>*/}
           </div>
         </div>
 
@@ -110,85 +146,252 @@ const Screenshots: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-primary-900 to-primary-800 text-white">
-        <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-5xl font-bold mb-6 font-fantasy">Screenshots & Media</h1>
-          <p className="text-xl text-primary-100 max-w-3xl mx-auto">
-            Explore stunning visuals from Heroes of Might and Magic: Olden Era. Browse screenshots, 
-            concept art, character designs, and more from the upcoming game.
+        <div className="container mx-auto px-4 py-6 text-center">
+          <h1 className="text-4xl mb-2 font-bold font-fantasy">Gallery</h1>
+          <p className="text-md text-primary-100 max-w-6xl mx-auto">
+              <span className="lg:hidden">Screenshots and other media from the game.</span>
+              <span className="hidden lg:block">Explore media from Heroes of Might and Magic: Olden Era. Browse screenshots, concept art, character designs, and more from the upcoming game.</span>
           </p>
         </div>
       </div>
 
       {/* Filters Section */}
       <div className="container mx-auto px-4 py-8">
-        <div className="bg-gray-800/50 rounded-lg p-6 mb-8">
-          <div className="flex flex-wrap gap-4 items-center">
-            {/* Category Filter */}
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => handleCategoryFilter(undefined)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  !filters.categoryId
-                    ? 'bg-primary-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                All Categories
-              </button>
-              {!categoriesLoading && categories.map((category) => (
+        {/* Desktop Filter Buttons - Hidden on Mobile */}
+        <div className="hidden lg:block">
+          <div className="bg-gray-800/50 rounded-lg p-6 mb-8">
+            <div className="flex flex-wrap gap-4 items-center">
+              {/* Category Filter */}
+              <div className="flex flex-wrap gap-2">
                 <button
-                  key={category.id}
-                  onClick={() => handleCategoryFilter(category.id)}
+                  onClick={() => handleCategoryFilter(undefined)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    filters.categoryId === category.id
-                      ? 'bg-primary-600 text-white'
-                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    !filters.categoryId
+                      ? 'bg-primary-600 text-white shadow-lg'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
                   }`}
-                  style={{ 
-                    backgroundColor: filters.categoryId === category.id ? category.color : undefined,
-                    borderColor: category.color
-                  }}
                 >
-                  {category.name}
+                  All Categories
                 </button>
-              ))}
-            </div>
+                {!categoriesLoading && categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => handleCategoryFilter(category.id)}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                      filters.categoryId === category.id
+                        ? 'text-white shadow-lg'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+                    }`}
+                    style={{
+                      backgroundColor: filters.categoryId === category.id ? category.color : undefined
+                    }}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
 
-            {/* Media Type Filter */}
-            <div className="flex gap-2 ml-auto">
-              <button
-                onClick={() => handleMediaTypeFilter(undefined)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  !filters.mediaType
-                    ? 'bg-secondary-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                All Types
-              </button>
-              <button
-                onClick={() => handleMediaTypeFilter('image')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  filters.mediaType === 'image'
-                    ? 'bg-secondary-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                Images
-              </button>
-              <button
-                onClick={() => handleMediaTypeFilter('video')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  filters.mediaType === 'video'
-                    ? 'bg-secondary-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                Videos
-              </button>
+              {/* Media Type Filter */}
+              <div className="flex gap-2 ml-auto">
+                <button
+                  onClick={() => handleMediaTypeFilter(undefined)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    !filters.mediaType
+                      ? 'bg-secondary-600 text-white shadow-lg'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+                  }`}
+                >
+                  All Types
+                </button>
+                <button
+                  onClick={() => handleMediaTypeFilter('image')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    filters.mediaType === 'image'
+                      ? 'bg-secondary-600 text-white shadow-lg'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+                  }`}
+                >
+                  Images
+                </button>
+                <button
+                  onClick={() => handleMediaTypeFilter('video')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    filters.mediaType === 'video'
+                      ? 'bg-secondary-600 text-white shadow-lg'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+                  }`}
+                >
+                  Videos
+                </button>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Mobile Filter Button - Shown only on Mobile/Tablet */}
+        <div className="lg:hidden mb-6">
+          <div className="flex items-center justify-between gap-4">
+            {/* Filter Button */}
+            <button
+              onClick={() => setShowFilterMenu(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-800/50 rounded-lg text-white font-medium transition-all hover:bg-gray-800/70 relative"
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z" />
+              </svg>
+              <span>Filters</span>
+              {activeFiltersCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {activeFiltersCount}
+                </span>
+              )}
+            </button>
+
+            {/* Active Filters Summary */}
+            <div className="flex items-center gap-2 text-sm text-gray-400 flex-1">
+              {activeFiltersCount === 0 ? (
+                <span>All items</span>
+              ) : (
+                <div className="flex items-center gap-2 flex-wrap">
+                  {getSelectedCategoryName() && (
+                    <span className="bg-primary-600/20 text-primary-300 px-2 py-1 rounded text-xs">
+                      {getSelectedCategoryName()}
+                    </span>
+                  )}
+                  {filters.mediaType && (
+                    <span className="bg-secondary-600/20 text-secondary-300 px-2 py-1 rounded text-xs">
+                      {filters.mediaType}
+                    </span>
+                  )}
+                  <button
+                    onClick={clearAllFilters}
+                    className="text-red-400 hover:text-red-300 text-xs"
+                  >
+                    Clear
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Filter Menu Overlay */}
+        {showFilterMenu && (
+          <div className="fixed inset-0 bg-black/50 z-50 lg:hidden" onClick={closeFilterMenu}>
+            <div className="fixed top-40 left-0 right-0 bg-gray-900 rounded-t-xl p-6 max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-white">Filter Gallery</h2>
+                <button
+                  onClick={closeFilterMenu}
+                  className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+                >
+                  <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Categories */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-gray-300 mb-3">Category</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => {
+                      handleCategoryFilter(undefined);
+                      closeFilterMenu();
+                    }}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all text-left ${
+                      !filters.categoryId
+                        ? 'bg-primary-600 text-white'
+                        : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                    }`}
+                  >
+                    All Categories
+                  </button>
+                  {!categoriesLoading && categories.map((category) => (
+                    <button
+                      key={category.id}
+                      onClick={() => {
+                        handleCategoryFilter(category.id);
+                        closeFilterMenu();
+                      }}
+                      className={`px-3 py-2 rounded-lg text-sm font-medium transition-all text-left ${
+                        filters.categoryId === category.id
+                          ? 'text-white'
+                          : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                      }`}
+                      style={{
+                        backgroundColor: filters.categoryId === category.id ? category.color : undefined
+                      }}
+                    >
+                      {category.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Media Type */}
+              <div className="mb-6">
+                <h3 className="text-sm font-medium text-gray-300 mb-3">Media Type</h3>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    onClick={() => {
+                      handleMediaTypeFilter(undefined);
+                      closeFilterMenu();
+                    }}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                      !filters.mediaType
+                        ? 'bg-secondary-600 text-white'
+                        : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                    }`}
+                  >
+                    All
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleMediaTypeFilter('image');
+                      closeFilterMenu();
+                    }}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                      filters.mediaType === 'image'
+                        ? 'bg-secondary-600 text-white'
+                        : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                    }`}
+                  >
+                    📷 Images
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleMediaTypeFilter('video');
+                      closeFilterMenu();
+                    }}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                      filters.mediaType === 'video'
+                        ? 'bg-secondary-600 text-white'
+                        : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                    }`}
+                  >
+                    🎥 Videos
+                  </button>
+                </div>
+              </div>
+
+              {/* Clear All Button */}
+              {activeFiltersCount > 0 && (
+                <button
+                  onClick={() => {
+                    clearAllFilters();
+                    closeFilterMenu();
+                  }}
+                  className="w-full px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
+                >
+                  Clear All Filters
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Media Grid */}
         {mediaItems.length === 0 ? (

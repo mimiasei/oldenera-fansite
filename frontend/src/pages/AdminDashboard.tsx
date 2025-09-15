@@ -221,7 +221,20 @@ const AdminDashboard: React.FC = () => {
           </div>
         )}
         
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <Link
+            to="/admin/menu"
+            className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <svg className="h-8 w-8 text-purple-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14-7v12a2 2 0 01-2 2H7a2 2 0 01-2-2V4a2 2 0 012-2h10a2 2 0 012 2v7z" />
+            </svg>
+            <div>
+              <h3 className="font-medium text-gray-900">Admin Menu</h3>
+              <p className="text-sm text-gray-500">Comprehensive data management</p>
+            </div>
+          </Link>
+
           <Link
             to="/admin/news/create"
             className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"

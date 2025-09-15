@@ -432,6 +432,33 @@ export const adminApi = {
     api.post('/thumbnailsync/trigger-manual'),
 };
 
+// Media Categories API
+export const updateMediaCategory = (id: number, data: Partial<MediaCategory>) =>
+  api.put(`/media/categories/${id}`, data);
+
+export const createMediaCategory = (data: Omit<MediaCategory, 'id' | 'createdAt' | 'updatedAt' | 'mediaItems'>) =>
+  api.post('/media/categories', data);
+
+export const deleteMediaCategory = (id: number) =>
+  api.delete(`/media/categories/${id}`);
+
+// News Articles API
+export const updateNewsArticle = (id: number, data: Partial<NewsArticle>) =>
+  api.put(`/news/${id}`, data);
+
+export const createNewsArticle = (data: Omit<NewsArticle, 'id' | 'createdAt' | 'updatedAt'>) =>
+  api.post('/news', data);
+
+export const deleteNewsArticle = (id: number) =>
+  api.delete(`/news/${id}`);
+
+// Users API
+export const updateUser = (id: string, data: Partial<User>) =>
+  api.put(`/admin/users/${id}`, data);
+
+export const deleteUser = (id: string) =>
+  api.delete(`/admin/users/${id}`);
+
 // SWR fetcher function
 export const fetcher = (url: string) => api.get(url).then(res => res.data);
 

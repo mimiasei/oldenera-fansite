@@ -36,7 +36,7 @@ const SEO: React.FC<SEOProps> = ({
   const metaDescription = description || defaultDescription;
   const metaImage = image ? (image.startsWith('http') ? image : `${siteUrl}${image}`) : defaultImage;
   const metaUrl = url ? `${siteUrl}${url}` : siteUrl;
-  const metaKeywords = keywords || 'Heroes of Might and Magic, Olden Era, strategy games, fantasy games, factions, units, heroes, spells, news, screenshots, community';
+  const metaKeywords = keywords || 'Heroes of Might and Magic, Olden Era, Unfrozen, Ubisoft, homm, homm oe, hommoe, olden era wiki, olden wiki, homm olden era wiki, homm oe wiki, hommoe news, olden era news, olden news, homm olden era news, homm oe news, hommoe news, strategy games, fantasy games, factions, units, heroes, spells, news, screenshots, community';
 
   return (
     <Helmet>

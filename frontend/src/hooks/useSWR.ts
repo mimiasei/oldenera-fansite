@@ -1,15 +1,16 @@
 import useSWR from 'swr';
-import { 
-  newsApi, 
-  NewsFilters, 
-  factionApi, 
-  FactionFilters, 
-  unitApi, 
-  UnitApiFilters, 
-  gameInfoApi, 
+import {
+  newsApi,
+  NewsFilters,
+  factionApi,
+  FactionFilters,
+  unitApi,
+  UnitApiFilters,
+  gameInfoApi,
   GameInfoFilters,
   mediaApi,
-  MediaFiltersParams
+  MediaFiltersParams,
+  adminApi
 } from '../services/api';
 import { 
   NewsArticle, 
@@ -529,5 +530,25 @@ export const useFeaturedMedia = (limit = 8) => {
     isError: !!error,
     error,
     refetch: mutate,
+  };
+};
+
+export const useUsers = () => {
+  const { data, error, isLoading, mutate } = useSWR(
+    '/admin/users',
+    () => adminApi.getUsers(),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 60000, // 1 minute
+    }
+  );
+
+  return {
+    users: data?.data || [],
+    isLoading,
+    isError: !!error,
+    error,
+    mutate,
   };
 };

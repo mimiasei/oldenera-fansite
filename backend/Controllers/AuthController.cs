@@ -234,6 +234,73 @@ public class AuthController : ControllerBase
         }
     }
 
+    [HttpPost("change-password")]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            // Verify current password
+            var currentPasswordValid = await _userManager.CheckPasswordAsync(user, request.CurrentPassword);
+            if (!currentPasswordValid)
+            {
+                _logger.LogWarning("Password change failed - incorrect current password for user {UserId} from IP {IP}",
+                    userId, HttpContext.Connection.RemoteIpAddress);
+                return BadRequest(new { message = "Current password is incorrect" });
+            }
+
+            // Check if new password is different from current
+            var isSamePassword = await _userManager.CheckPasswordAsync(user, request.NewPassword);
+            if (isSamePassword)
+            {
+                return BadRequest(new { message = "New password must be different from current password" });
+            }
+
+            // Change password
+            var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                _logger.LogWarning("Password change failed for user {UserId}: {Errors}", userId, errors);
+                return BadRequest(new { message = "Password change failed", errors = result.Errors.Select(e => e.Description) });
+            }
+
+            // Update security stamp to invalidate existing tokens/sessions
+            await _userManager.UpdateSecurityStampAsync(user);
+
+            _logger.LogInformation("Password changed successfully for user {UserId} from IP {IP}",
+                userId, HttpContext.Connection.RemoteIpAddress);
+
+            // TODO: Send email notification about password change
+            // await _emailService.SendPasswordChangeNotificationAsync(user.Email, HttpContext.Connection.RemoteIpAddress?.ToString());
+
+            return Ok(new { message = "Password changed successfully" });
+        }
+        catch (Exception ex)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            _logger.LogError(ex, "Password change failed for user {UserId}", userId);
+            return StatusCode(500, new { message = "Password change failed" });
+        }
+    }
+
     [HttpPut("profile")]
     [Authorize]
     public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest request)
@@ -322,6 +389,12 @@ public class UpdateProfileRequest
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public string? ProfilePictureUrl { get; set; }
+}
+
+public class ChangePasswordRequest
+{
+    public string CurrentPassword { get; set; } = string.Empty;
+    public string NewPassword { get; set; } = string.Empty;
 }
 
 public class AuthResponse

@@ -5,7 +5,7 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 ## 🏰 Features
 
 ### Core Systems (Production Ready)
-- **Complete User Authentication System**: JWT-based authentication with role management, fantasy avatar selection (56 themed portraits), and comprehensive UX
+- **Complete User Authentication System**: JWT-based authentication with role management, fantasy avatar selection (56 themed portraits), secure password change functionality, and comprehensive UX
 - **Enhanced Admin Panel**: Complete dashboard with user management, statistics, and administrative controls
 - **Professional Game Information System**: Full faction browsing, detailed unit/hero pages with filtering, and comprehensive game content database
 - **Media Gallery System**: Professional screenshot gallery with 6 categories, lightbox viewer with fullscreen support, and comprehensive admin management interface
@@ -19,7 +19,9 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 - **Advanced Admin Workflow**: Intuitive batch editing system with local-only changes, Save/Revert controls, and inline validation replacing popup dialogs
 - **Enhanced Data Entry Experience**: Tab navigation for seamless field-to-field movement, fixed numeric value display (0 values now properly shown), and comprehensive unit statistics including Morale/Luck fields
 - **Responsive Table Design**: Fully responsive asset management tables with intelligent column sizing, icon-based actions, and professional dropdown components
-- **Comprehensive SEO Optimization**: React Helmet Async with dynamic meta tags, Open Graph support, Twitter Cards, and advanced structured data (JSON-LD) for enhanced search visibility
+- **Comprehensive AdminTable Component**: Reusable generic table component for consistent data management across all admin interfaces with TypeScript generics and batch save/revert pattern
+- **Centralized Admin Menu System**: Professional sidebar navigation for unified content management (Media Categories, News Articles, Users) with collapsible sidebar and space optimization
+- **Comprehensive SEO Optimization**: React Helmet Async with dynamic meta tags, Open Graph support, Twitter Cards, advanced structured data (JSON-LD), and enhanced keyword coverage (developer names, game abbreviations, wiki variants)
 - **Production-Grade Security**: Rate limiting middleware, comprehensive security headers (CSP, X-Frame-Options, XSS protection), and API abuse protection
 - **Search Engine Optimization**: Dynamic XML sitemap generation, robots.txt with proper crawl directives, and optimized social media sharing
 
@@ -40,7 +42,7 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 - **Optimized Content Layout**: Streamlined page designs focusing on core functionality and eliminating UI bloat
 - **Mobile-First Navigation**: Responsive hamburger menu with smooth animations, body scroll lock, and keyboard accessibility
 - **Interactive Content**: Tabbed interfaces, filtering systems, and comprehensive game content presentation
-- **Secure Authentication**: Production-grade password requirements, account lockout protection, and proper hash management
+- **Secure Authentication**: Production-grade password requirements, secure password change system with current password verification and session invalidation, account lockout protection, and proper hash management
 - **Social Media Ready**: Optimized Open Graph and Twitter Card support for professional link previews and social sharing
 
 ## 🛠 Technology Stack
@@ -242,6 +244,11 @@ The site features a fantasy-themed design inspired by the Heroes of Might and Ma
 - [x] Inline validation system replacing popup dialogs with hover tooltips and visual indicators
 - [x] Enhanced validation error display with red cell borders and detailed hover feedback
 - [x] Streamlined faction assignment using existing filter dropdown for automatic factionId population
+- [x] Comprehensive AdminTable reusable component with TypeScript generics for consistent data management
+- [x] Centralized AdminMenu system with sidebar navigation for unified content management
+- [x] Enhanced SEO keywords with developer names, game abbreviations, and comprehensive wiki-related terms
+- [x] Secure password change system with modal interface, current password verification, and session invalidation
+- [x] Production-grade password change security with rate limiting, audit logging, and comprehensive validation
 - [ ] Enhanced game asset filtering and search capabilities
 - [ ] Bulk import/export functionality for game assets
 - [ ] Google OAuth integration

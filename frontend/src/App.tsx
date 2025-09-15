@@ -24,6 +24,7 @@ import Screenshots from './pages/Screenshots';
 import AdminMedia from './pages/AdminMedia';
 import AdminMediaEdit from './pages/AdminMediaEdit';
 import AdminGameAssets from './pages/admin/AdminGameAssets';
+import AdminMenu from './pages/AdminMenu';
 import Forum from './pages/Forum';
 import NotificationContainer from './components/NotificationContainer';
 import { Analytics } from '@vercel/analytics/react';
@@ -105,7 +106,12 @@ function App() {
                   <AdminGameAssets />
                 </ProtectedRoute>
               } />
-              
+              <Route path="/admin/menu" element={
+                <ProtectedRoute requireAdmin={true}>
+                  <AdminMenu />
+                </ProtectedRoute>
+              } />
+
               {/* Game Information Routes */}
               <Route path="/factions" element={<Factions />} />
               <Route path="/factions/:id" element={<FactionDetail />} />
