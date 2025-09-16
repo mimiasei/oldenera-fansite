@@ -1398,3 +1398,43 @@ Completed full production deployment setup with automatic environment detection,
 - **Enterprise-Grade Protection**: Current password verification, session invalidation, and audit logging
 - **Professional UX**: Secure modal-based workflow with clear user feedback and validation
 - **Complete Integration**: Seamlessly integrated into profile management with proper security messaging
+
+## 2025-09-15 (Part 4)
+
+### Theme-Aware Background Overlay System
+- **Dynamic Background Adaptation**: Home page background overlay now responds to theme selection
+  - Light theme maintains original white overlay: `rgba(255, 255, 255, 0.8)` and `rgba(255, 255, 255, 0.7)`
+  - Dark theme implements requested dark overlay: `rgba(0, 0, 0, 0.8)` and `rgba(0, 0, 0, 0.7)`
+  - Seamless transitions between themes maintaining the same background wallpaper image
+- **Theme Context Integration**: Leverages existing ThemeProvider system for consistent theming
+  - Uses established `useTheme` hook for accessing current theme state
+  - Maintains localStorage persistence and system preference detection
+  - Integrates with existing theme toggle buttons in header and mobile navigation
+- **Responsive Text Adaptation**: Text colors automatically adapt to theme for optimal readability
+  - Light theme: Black text for high contrast against light background overlay
+  - Dark theme: White text for high contrast against dark background overlay
+  - Maintains accessibility standards across both theme modes
+- **Implementation Architecture**: Clean, maintainable code structure using React hooks
+  - Theme-based conditional styling with TypeScript type safety
+  - Reusable pattern for implementing theme-aware backgrounds across other components
+  - No hardcoded values - all styling decisions driven by theme context state
+
+### Technical Implementation Details
+- **Background Overlay Logic**: Dynamic gradient generation based on theme selection
+  - Conditional rgba value assignment with clean ternary operator implementation
+  - Maintains existing wallpaper image while only modifying overlay darkness/lightness
+  - CSS-in-JS approach using React inline styles for dynamic theme-based values
+- **Theme System Enhancement**: Built upon existing robust theme infrastructure
+  - No modifications required to existing ThemeProvider or ThemeContext
+  - Seamless integration with established theme toggle functionality
+  - Maintains all existing theme persistence and system preference features
+- **User Experience Consistency**: Cohesive theming experience across the application
+  - Home page theming now matches established theme system used throughout the site
+  - Instant visual feedback when switching between light and dark modes
+  - Professional transition effects maintain visual continuity during theme changes
+
+### Status
+- **Theme System Complete**: Comprehensive light/dark theme implementation with background adaptation
+- **User-Friendly**: Intuitive theme toggling with immediate visual feedback and persistent preferences
+- **Accessibility Focused**: High contrast text and background combinations for both theme modes
+- **Maintainable Architecture**: Clean implementation using established patterns and React best practices

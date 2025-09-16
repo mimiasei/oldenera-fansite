@@ -104,7 +104,8 @@
 - [x] Implement Tab navigation for seamless data entry (Tab to jump between fields automatically)
 - [x] Add Morale and Luck fields to unit management system with database migration
 - [x] Remove Size field from unit management as requested
-- [ ] Implement dark/light theme toggle
+- [x] Implement dark/light theme toggle with theme-aware background overlays and dynamic styling
+- [x] Add secure password change system with comprehensive security measures and user-friendly modal interface
 - [ ] Create offline support with SWR
 - [ ] Add accessibility improvements (ARIA labels, keyboard navigation)
 - [ ] Implement breadcrumb navigation site-wide
