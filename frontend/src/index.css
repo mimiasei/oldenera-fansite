@@ -56,16 +56,3 @@
     @apply bg-gradient-to-r from-amber-600 to-purple-900;
   }
 }
-
-/* Hide Disqus reactions when toggle is active */
-.disqus-container.hide-reactions iframe {
-  /* Additional CSS will be injected via JavaScript since Disqus content is in iframe */
-}
-
-/* Target common Disqus reaction selectors */
-.disqus-container.hide-reactions [class*="reactions"],
-.disqus-container.hide-reactions [data-role="reactions"],
-.disqus-container.hide-reactions .post-reactions,
-.disqus-container.hide-reactions .thread-reactions {
-  display: none !important;
-}

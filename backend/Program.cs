@@ -209,6 +209,7 @@ builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrateg
 // Add custom services
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IImageProcessingService, ImageProcessingService>();
+builder.Services.AddScoped<IDisqusSsoService, DisqusSsoService>();
 
 // Add background services
 builder.Services.AddHostedService<ThumbnailGenerationService>();
