@@ -484,6 +484,21 @@ If issues occur, rollback is straightforward:
    - Clean up environment variables
    - Update documentation
 
+## ✅ **MIGRATION COMPLETED SUCCESSFULLY** (Updated with SSO Fix)
+
+### 🔧 **Critical SSO Fix Applied:**
+
+**Issue**: FastComments SSO was failing with "malformed-sso" and "SSO payload hash error"
+
+**Root Cause**: Incorrect HMAC message format
+- **Previous (Incorrect)**: `HMAC-SHA256(timestamp + userDataJSONBase64)`
+- **Correct**: `HMAC-SHA256(userDataJSONBase64 only)`
+
+**Fix Applied**:
+- Updated HMAC calculation to hash **only** the `userDataJSONBase64` field
+- Per FastComments TypeScript docs: "The HMAC-SHA256 hash of the userDataJSONBase64 field, using your secret key"
+- Verified all required fields present: `id`, `email`, `username`
+
 ## ✅ **MIGRATION COMPLETED SUCCESSFULLY**
 
 ### **Final Implementation Status:**

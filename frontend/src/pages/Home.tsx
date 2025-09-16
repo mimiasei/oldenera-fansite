@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useLatestNews } from '../hooks/useSWR';
 import { NewsCardSkeleton } from '../components/skeletons/NewsArticleSkeleton';
 import SEO from '../components/SEO';
+import GameInfoCard from '../components/GameInfoCard';
 import { generateWebsiteStructuredData, generateGameStructuredData } from '../utils/structuredData';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -50,6 +51,27 @@ const Home = () => {
           </Link>
         </div>
       </section>
+
+      {/* Game Info Card Section */}
+      {/*<aside className="container mx-auto px-4 py-8">*/}
+      {/*  <div className="flex justify-center">*/}
+      {/*    <GameInfoCard*/}
+      {/*      image="/images/logos/OE_wallpapper.webp"*/}
+      {/*      developer="Unfrozen"*/}
+      {/*      publishers={["Ubisoft", "Hooded Horse"]}*/}
+      {/*      releaseDate="2025 (Early Access)"*/}
+      {/*      genre="Turn-based strategy"*/}
+      {/*      universe="Might and Magic universe"*/}
+      {/*      setting="Jadame continent"*/}
+      {/*      platforms={["Microsoft Windows"]}*/}
+      {/*      modes={["Single-player", "Multi-player"]}*/}
+      {/*      quote="The Heroes have awakened, and a new chapter begins in the legendary world of Might and Magic."*/}
+      {/*      quoteAuthor="Heroes of Might and Magic: Olden Era"*/}
+      {/*      status="In Development"*/}
+      {/*      className="shadow-xl"*/}
+      {/*    />*/}
+      {/*  </div>*/}
+      {/*</aside>*/}
 
       {/* Latest News Section */}
       <section className="container rounded-xl mx-auto px-4 py-6" style={{ backgroundColor: `rgba(255, 255, 255, 0.05)`}}>

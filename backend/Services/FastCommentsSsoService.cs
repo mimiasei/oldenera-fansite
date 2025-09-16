@@ -75,18 +75,17 @@ public class FastCommentsSsoService : IFastCommentsSsoService
             // Generate timestamp in MILLISECONDS (Unix timestamp) - FastComments current spec uses milliseconds
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-            // Create message for HMAC signing: timestamp + userDataBase64 (FastComments format)
-            var message = $"{timestamp}{userDataBase64}";
+            // FastComments HMAC: Hash ONLY the userDataJSONBase64 field (not timestamp + userDataBase64)
+            // Per TypeScript docs: "The HMAC-SHA256 hash of the userDataJSONBase64 field, using your secret key"
 
             // Debug logging
             _logger.LogInformation("FastComments SSO Debug - UserDataJSON: {UserDataJson}", userDataJson);
             _logger.LogInformation("FastComments SSO Debug - UserDataBase64: {UserDataBase64}", userDataBase64);
             _logger.LogInformation("FastComments SSO Debug - Timestamp: {Timestamp}", timestamp);
-            _logger.LogInformation("FastComments SSO Debug - Message: {Message}", message);
 
-            // Generate HMAC-SHA256 signature (not SHA1 like Disqus)
+            // Generate HMAC-SHA256 signature of ONLY the userDataBase64 (not timestamp + userDataBase64)
             using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(fastCommentsSecretKey));
-            var signatureBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(message));
+            var signatureBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(userDataBase64));
             var signature = Convert.ToHexString(signatureBytes).ToLowerInvariant();
 
             _logger.LogInformation("FastComments SSO Debug - Signature: {Signature}", signature);
