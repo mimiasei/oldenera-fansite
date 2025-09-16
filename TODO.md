@@ -161,6 +161,11 @@
 - [ ] Create leaderboards for community engagement
 - [ ] Add user-generated content features
 
+### 13. Lighthouse audit. Findings: 
+- [ ] (Best Practices) Alt text for images: "Several images missing alt attributes",
+- [ ] (SSO) Meta description: "No meta description tag found on homepage",
+- [ ] (SSO) Structured data: "No schema.org WebSite or Breadcrumb structured data detected"
+
 ## Completed ✅
 
 ### Game Information System Infrastructure

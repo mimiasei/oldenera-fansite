@@ -30,9 +30,10 @@ public class FastCommentsSsoService : IFastCommentsSsoService
             return new FastCommentsSsoToken();
         }
 
+        // FastComments requirement: username cannot be an email
         var username = !string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(lastName)
             ? $"{firstName} {lastName}"
-            : email.Split('@')[0]; // Use email prefix as fallback
+            : email.Split('@')[0]; // Use email prefix to ensure it's not an email format
 
         // Get avatar URL from claims if available
         var avatarUrl = user.FindFirst("ProfilePictureUrl")?.Value;
@@ -59,25 +60,36 @@ public class FastCommentsSsoService : IFastCommentsSsoService
                 id = userId,
                 username = username,
                 email = email,
-                avatar = avatarUrl,
-                // Optional: add additional user properties
-                // displayLabel = "Community Member", // Custom user label
-                // groupIds = new[] { "members" } // User groups for access control
+                avatar = avatarUrl
             };
 
-            var userDataJson = JsonSerializer.Serialize(userData);
+            // Use compact JSON serialization (no spaces)
+            var jsonOptions = new JsonSerializerOptions
+            {
+                WriteIndented = false,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+            var userDataJson = JsonSerializer.Serialize(userData, jsonOptions);
             var userDataBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(userDataJson));
 
-            // Generate timestamp in MILLISECONDS (FastComments requirement)
+            // Generate timestamp in MILLISECONDS (Unix timestamp) - FastComments current spec uses milliseconds
             var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
             // Create message for HMAC signing: timestamp + userDataBase64 (FastComments format)
             var message = $"{timestamp}{userDataBase64}";
 
+            // Debug logging
+            _logger.LogInformation("FastComments SSO Debug - UserDataJSON: {UserDataJson}", userDataJson);
+            _logger.LogInformation("FastComments SSO Debug - UserDataBase64: {UserDataBase64}", userDataBase64);
+            _logger.LogInformation("FastComments SSO Debug - Timestamp: {Timestamp}", timestamp);
+            _logger.LogInformation("FastComments SSO Debug - Message: {Message}", message);
+
             // Generate HMAC-SHA256 signature (not SHA1 like Disqus)
             using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(fastCommentsSecretKey));
             var signatureBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(message));
             var signature = Convert.ToHexString(signatureBytes).ToLowerInvariant();
+
+            _logger.LogInformation("FastComments SSO Debug - Signature: {Signature}", signature);
 
             return new FastCommentsSsoToken
             {
