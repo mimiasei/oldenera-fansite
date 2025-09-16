@@ -1438,3 +1438,43 @@ Completed full production deployment setup with automatic environment detection,
 - **User-Friendly**: Intuitive theme toggling with immediate visual feedback and persistent preferences
 - **Accessibility Focused**: High contrast text and background combinations for both theme modes
 - **Maintainable Architecture**: Clean implementation using established patterns and React best practices
+
+## 2025-09-16
+
+### SPA Routing Fix and Disqus SSO Integration
+- **Single Page Application Routing Fix**: Resolved 404 errors when refreshing on non-home pages
+  - Created `_redirects` file for Render.com deployment with proper SPA routing configuration
+  - Added `netlify.toml` and `.htaccess` files for alternative hosting platform compatibility
+  - Updated Vite build configuration with proper output directory and asset handling
+  - All client-side routes (news, factions, forum, admin) now work correctly on page refresh
+- **Disqus SSO Implementation**: Complete Single Sign-On integration for seamless comment authentication
+  - Backend DisqusSsoService with HMAC-SHA1 token generation for secure user authentication
+  - New `/auth/disqus-sso` API endpoint providing signed tokens for authenticated users
+  - Frontend integration automatically passes SSO tokens to Disqus for logged-in users
+  - Graceful degradation ensures comments work normally without SSO configuration
+  - Future-ready for Disqus Business plan upgrade while remaining safe for current deployment
+- **Disqus Comments Cleanup**: Streamlined comment system following account-level reaction management
+  - Removed client-side reaction hiding functionality in favor of Disqus admin settings
+  - Cleaned up localhost placeholder to remove mock reaction testing components
+  - Simplified component architecture focusing on core comment functionality and SSO integration
+
+### Technical Implementation Details
+- **SPA Routing Configuration**: Multiple hosting platform support for seamless deployment
+  - `_redirects`: `/* /index.html 200` for Render.com and Netlify compatibility
+  - `.htaccess`: Apache rewrite rules for traditional web hosting
+  - Vite build optimization with proper asset organization and chunk management
+- **SSO Security Architecture**: Enterprise-grade authentication token generation
+  - HMAC-SHA1 signing with configurable secret key for production security
+  - User data payload with ID, username, email, and avatar URL integration
+  - Timestamp-based token validation preventing replay attacks
+  - Comprehensive error handling and logging for production deployment
+- **Component Architecture**: Clean separation of concerns with graceful error handling
+  - Authentication-aware Disqus configuration with automatic SSO token integration
+  - Fallback mechanisms ensuring comment functionality regardless of SSO status
+  - Simplified localhost development experience with streamlined placeholder content
+
+### Status
+- **SPA Routing Complete**: All pages now work correctly on refresh across different hosting platforms
+- **Disqus SSO Ready**: Complete SSO implementation prepared for future Business plan upgrade
+- **Production Deployment**: Enhanced deployment configuration supporting multiple hosting platforms
+- **Clean Architecture**: Simplified comment system with focus on core functionality and future extensibility

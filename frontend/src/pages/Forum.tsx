@@ -1,4 +1,4 @@
-import DisqusComments from '../components/DisqusComments';
+import FastCommentsWidget from '../components/FastCommentsWidget';
 
 const Forum = () => {
   return (
@@ -31,7 +31,7 @@ const Forum = () => {
           </p>
           
           {/* Disqus Forum Embed */}
-          <DisqusComments
+          <FastCommentsWidget
             url={`${window.location.origin}/forum`}
             identifier="olden-era-forum-main"
             title="Heroes of Might and Magic: Olden Era Community Forum"

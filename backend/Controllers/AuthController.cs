@@ -14,20 +14,20 @@ public class AuthController : ControllerBase
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
     private readonly IJwtService _jwtService;
-    private readonly IDisqusSsoService _disqusSsoService;
+    private readonly IFastCommentsSsoService _fastCommentsSsoService;
     private readonly ILogger<AuthController> _logger;
 
     public AuthController(
         UserManager<User> userManager,
         SignInManager<User> signInManager,
         IJwtService jwtService,
-        IDisqusSsoService disqusSsoService,
+        IFastCommentsSsoService fastCommentsSsoService,
         ILogger<AuthController> logger)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _jwtService = jwtService;
-        _disqusSsoService = disqusSsoService;
+        _fastCommentsSsoService = fastCommentsSsoService;
         _logger = logger;
     }
 
@@ -363,26 +363,24 @@ public class AuthController : ControllerBase
         }
     }
 
-    [HttpGet("disqus-sso")]
+    [HttpGet("fastcomments-sso")]
     [Authorize]
-    public IActionResult GetDisqusSsoToken()
+    public IActionResult GetFastCommentsSsoToken()
     {
         try
         {
-            var ssoToken = _disqusSsoService.GenerateSsoToken(User);
-
-            if (string.IsNullOrEmpty(ssoToken))
+            var ssoToken = _fastCommentsSsoService.GenerateSsoToken(User);
+            if (string.IsNullOrEmpty(ssoToken.UserDataJSONBase64))
             {
-                return BadRequest(new { message = "Unable to generate Disqus SSO token" });
+                return BadRequest(new { message = "Unable to generate FastComments SSO token" });
             }
-
-            return Ok(new { ssoToken });
+            return Ok(ssoToken);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to generate Disqus SSO token for user {UserId}",
+            _logger.LogError(ex, "Failed to generate FastComments SSO token for user {UserId}",
                 User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            return StatusCode(500, new { message = "Failed to generate SSO token" });
+            return StatusCode(500, new { message = "Internal server error generating SSO token" });
         }
     }
 

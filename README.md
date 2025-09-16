@@ -9,7 +9,7 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 - **Enhanced Admin Panel**: Complete dashboard with user management, statistics, and administrative controls
 - **Professional Game Information System**: Full faction browsing, detailed unit/hero pages with filtering, and comprehensive game content database
 - **Media Gallery System**: Professional screenshot gallery with 6 categories, lightbox viewer with fullscreen support, and comprehensive admin management interface
-- **Community Forum Integration**: Optimized Disqus-powered forum system with streamlined UX and immediate access to discussions
+- **Community Forum Integration**: Disqus-powered forum system with SSO (Single Sign-On) integration for seamless authentication and streamlined UX
 - **Professional Loading Skeleton System**: Comprehensive skeleton components across all pages for enhanced user experience
 - **Universal Admin Edit Shortcuts**: Quick-access edit buttons throughout the site for administrators and moderators
 - **WebP Thumbnail Optimization**: Modern image format implementation with 25-50% file size reduction, dual-format serving (WebP + JPEG), and CLI management tools
@@ -26,7 +26,7 @@ An unofficial fan site for the upcoming PC game "Heroes of Might and Magic: Olde
 - **Search Engine Optimization**: Dynamic XML sitemap generation, robots.txt with proper crawl directives, and optimized social media sharing
 
 ### Technical Excellence
-- **Production-Ready Deployment**: Fully deployed with automatic database migrations, environment detection, and API connectivity
+- **Production-Ready Deployment**: Fully deployed with automatic database migrations, environment detection, API connectivity, and SPA routing support for all hosting platforms
 - **Robust Database Management**: PostgreSQL with Entity Framework Core, secure admin seeding, and schema validation tools
 - **Smart Environment Configuration**: Automatic API endpoint detection (local ↔ production) with CORS policy management
 - **Migration Safety System**: Comprehensive schema validation tools, automated checking scripts, and error prevention guidelines

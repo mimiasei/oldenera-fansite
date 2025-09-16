@@ -1,6 +1,6 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useNewsArticle } from '../hooks/useSWR';
-import DisqusComments from '../components/DisqusComments';
+import FastCommentsWidget from '../components/FastCommentsWidget';
 import AdminEditButton from '../components/AdminEditButton';
 import SEO from '../components/SEO';
 import { generateNewsArticleStructuredData, generateBreadcrumbStructuredData } from '../utils/structuredData';
@@ -189,7 +189,7 @@ const NewsArticle = () => {
         {/* Comments Section */}
         <section className="mt-12 pt-8 border-t border-gray-200">
           <h2 className="text-2xl font-bold mb-6 font-fantasy">Comments</h2>
-          <DisqusComments
+          <FastCommentsWidget
             url={`${window.location.origin}/news/${article.id}`}
             identifier={`news-article-${article.id}`}
             title={article.title}

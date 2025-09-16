@@ -209,7 +209,7 @@ builder.Services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrateg
 // Add custom services
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IImageProcessingService, ImageProcessingService>();
-builder.Services.AddScoped<IDisqusSsoService, DisqusSsoService>();
+builder.Services.AddScoped<IFastCommentsSsoService, FastCommentsSsoService>();
 
 // Add background services
 builder.Services.AddHostedService<ThumbnailGenerationService>();
@@ -310,12 +310,12 @@ app.Use(async (context, next) =>
 
     // Content Security Policy
     var csp = "default-src 'self'; " +
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' disqus.com *.disqus.com *.disquscdn.com; " +
-              "style-src 'self' 'unsafe-inline' fonts.googleapis.com *.disquscdn.com; " +
-              "font-src 'self' fonts.gstatic.com *.disquscdn.com; " +
-              "img-src 'self' data: blob: *.disquscdn.com disqus.com referrer.disqus.com; " +
-              "connect-src 'self' disqus.com *.disqus.com *.disquscdn.com; " +
-              "frame-src disqus.com; " +
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' fastcomments.com *.fastcomments.com; " +
+              "style-src 'self' 'unsafe-inline' fonts.googleapis.com fastcomments.com *.fastcomments.com; " +
+              "font-src 'self' fonts.gstatic.com fastcomments.com *.fastcomments.com; " +
+              "img-src 'self' data: blob: fastcomments.com *.fastcomments.com; " +
+              "connect-src 'self' fastcomments.com *.fastcomments.com; " +
+              "frame-src fastcomments.com *.fastcomments.com; " +
               "object-src 'none'; " +
               "base-uri 'self';";
     context.Response.Headers.Append("Content-Security-Policy", csp);

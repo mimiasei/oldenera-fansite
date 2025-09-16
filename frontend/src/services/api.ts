@@ -164,7 +164,13 @@ export const authAPI = {
   updateProfile: (data: UpdateProfileRequest) => api.put<User>('/auth/profile', data),
   refreshToken: () => api.post<{ token: string }>('/auth/refresh'),
   logout: () => api.post('/auth/logout'),
-  getDisqusSsoToken: () => api.get<{ ssoToken: string }>('/auth/disqus-sso'),
+  getFastCommentsSsoToken: () => api.get<{
+    userDataJSONBase64: string;
+    verificationHash: string;
+    timestamp: number;
+    loginURL: string;
+    logoutURL: string;
+  }>('/auth/fastcomments-sso'),
 };
 
 // Faction API
